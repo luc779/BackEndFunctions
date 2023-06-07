@@ -31,6 +31,7 @@ namespace Company.Test
 
     [Fact]
     public async Task UserNotExistsInDatabase() {
+      // input test userKey
       const string userKey = "pGIWAl55j3XH4LFHbXgsdtoM46j2";
       var request = TestFactory.CreateHttpRequest("UserKey", userKey, "post");
       var response = (ObjectResult)await CreateUser.CreateUserWithUserKey(request, logger);

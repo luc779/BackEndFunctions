@@ -1,16 +1,9 @@
-using System;
-using System.IO;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
-using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
-using System.Threading;
-using System.Globalization;
 using FirebaseAdmin.Auth;
-using BCrypt.Net;
 using MySqlConnector;
 
 namespace Company
@@ -50,6 +43,8 @@ namespace Company
           if (isUserAdded) {
             return new OkObjectResult("Success");
           }
+
+          // For some reason, the userkey is not added to the database
           return new BadRequestObjectResult("InternalError");
         } catch (Exception e) {
           return new BadRequestObjectResult("InternalError");
