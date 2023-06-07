@@ -15,6 +15,10 @@ namespace Company
 {
     public static class CreateUser
     {
+      static CreateUser()
+      {
+          FirebaseInitializer.Initialize();
+      }
 
       [Function("CreateUser")]
       public static async Task<IActionResult> CreateUserWithUserKey(
