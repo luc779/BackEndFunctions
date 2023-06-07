@@ -28,5 +28,14 @@ namespace Company.Test
       Assert.Equal(400, response.StatusCode);
       Assert.Equal("UserKeyNotAuth", response.Value);
     }
+
+    [Fact]
+    public async Task UserNotExistsInDatabase() {
+      const string userKey = "pGIWAl55j3XH4LFHbXgsdtoM46j2";
+      var request = TestFactory.CreateHttpRequest("UserKey", userKey, "post");
+      var response = (ObjectResult)await CreateUser.CreateUserWithUserKey(request, logger);
+      Assert.Equal(200, response.StatusCode);
+      Assert.Equal("Success", response.Value);
+    }
   }
 }
