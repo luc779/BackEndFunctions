@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 using System.Threading;
 using System.Globalization;
 using FirebaseAdmin.Auth;
+using BCrypt.Net;
 
 namespace Company
 {
@@ -36,7 +37,17 @@ namespace Company
 
           UserRecord userRecord = await FirebaseAuth.DefaultInstance.GetUserAsync(userKey);
           // See the UserRecord reference doc for the contents of userRecord.
-          Console.WriteLine($"Successfully fetched user data: {userRecord.Uid}");
+          //Console.WriteLine($"Successfully fetched user data: {userRecord.Uid}");
+
+          try {
+            // Hash the userKey
+            string hashedUserKey = BCrypt.Net.BCrypt.HashPassword(userKey);
+
+            // Check if the database has a user with the same hashedUserKey
+            // Selet UserKey from Users where UserKey is equal to hashedUserKey
+          } catch (Exception e) {
+          }
+
         } catch (ArgumentException argError) {
 
         } catch (FirebaseAuthException authError) {
