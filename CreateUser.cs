@@ -11,49 +11,110 @@ using System.Threading;
 using System.Globalization;
 using FirebaseAdmin.Auth;
 using BCrypt.Net;
+using MySqlConnector;
 
 namespace Company
 {
-    public static class CreateUser
+  public static class CreateUser
+  {
+    static CreateUser()
     {
-      static CreateUser()
+        FirebaseInitializer.Initialize();
+    }
+
+    [Function("CreateUser")]
+    public static async Task<IActionResult> CreateUserWithUserKey(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "create-user")] HttpRequest req,
+        ILogger log)
+    {
+      try
       {
-          FirebaseInitializer.Initialize();
-      }
+        // Get post body if any
+        string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+        dynamic data = JsonConvert.DeserializeObject(requestBody);
 
-      [Function("CreateUser")]
-      public static async Task<IActionResult> CreateUserWithUserKey(
-          [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "create-user")] HttpRequest req,
-          ILogger log)
-      {
-        try {
-          // Get post body if any
-          string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-          dynamic data = JsonConvert.DeserializeObject(requestBody);
+        // Get "input" parameter from HTTP request as either parameter or post value
+        string userKey = req.Query["UserKey"];
+        userKey = userKey ?? data?.UserKey;
 
-          // Get "input" parameter from HTTP request as either parameter or post value
-          string userKey = req.Query["UserKey"];
-          userKey = userKey ?? data?.UserKey;
+        UserRecord userRecord = await FirebaseAuth.DefaultInstance.GetUserAsync(userKey);
+        // See the UserRecord reference doc for the contents of userRecord.
 
-          UserRecord userRecord = await FirebaseAuth.DefaultInstance.GetUserAsync(userKey);
-          // See the UserRecord reference doc for the contents of userRecord.
-          //Console.WriteLine($"Successfully fetched user data: {userRecord.Uid}");
+        try
+        {
+          // Hash the userKey
+          string hashedUserKey = BCrypt.Net.BCrypt.HashPassword(userKey);
 
-          try {
-            // Hash the userKey
-            string hashedUserKey = BCrypt.Net.BCrypt.HashPassword(userKey);
-
-            // Check if the database has a user with the same hashedUserKey
-            // Selet UserKey from Users where UserKey is equal to hashedUserKey
-          } catch (Exception e) {
+          // Check if the database has a user with the same hashedUserKey
+          bool isUserAdded = AddUserToDatabase(hashedUserKey);
+          if (isUserAdded) {
+            return new OkObjectResult("Success");
           }
-
-        } catch (ArgumentException argError) {
-
-        } catch (FirebaseAuthException authError) {
-          return new BadRequestObjectResult("UserKeyNotAuth");
+          return new BadRequestObjectResult("InternalError");
+        } catch (Exception e) {
+          return new BadRequestObjectResult("InternalError");
         }
-        throw new NotImplementedException();
+
+      } catch (ArgumentException argError) {
+        return new BadRequestObjectResult("InvalidArgument");
+      } catch (FirebaseAuthException authError) {
+        return new BadRequestObjectResult("UserKeyNotAuth");
+      }
+      throw new NotImplementedException();
+    }
+
+    private static bool AddUserToDatabase(string hashedUserKey) {
+      string server = "databaseht.cyethqvobvkg.us-west-2.rds.amazonaws.com";
+      string database = "Hackathon";
+      string uid = "masterUsername";
+      string password = "vafwa4-vozqyn-naxqAb";
+      string connectionString = "server=" + server + ";uid=" + uid +";pwd=" + password + ";database=" + database;
+
+      using (MySqlConnection connection = new MySqlConnection(connectionString))
+      {
+        connection.Open();
+
+        // Start the transaction
+        using (MySqlTransaction transaction = connection.BeginTransaction())
+        {
+          try
+          {
+            // Selet UserKey from Users where UserKey is equal to hashedUserKey
+            using (MySqlCommand command = connection.CreateCommand())
+            {
+              command.Transaction = transaction;
+              command.CommandText = "SELECT USERKEY FROM Users WHERE UserKey = '" + hashedUserKey + "'";
+              using MySqlDataReader reader = command.ExecuteReader();
+              if (reader.HasRows) {
+                return true;
+              }
+            }
+
+            // Insert a user to Users table with the hashedUserKey
+            using (MySqlCommand command = connection.CreateCommand())
+            {
+              string query = "INSERT INTO Users (USERKEY) Values (@USERKEY)";
+              command.CommandText = query;
+              command.Parameters.AddWithValue("@USERKEY", hashedUserKey);
+              command.ExecuteNonQuery();
+            }
+
+            // Commit the transaction
+            transaction.Commit();
+
+            // Transaction completed successfully
+            return true;
+          }
+          catch (Exception ex)
+          {
+            // An error occurred, rollback the transaction
+            transaction.Rollback();
+
+            // Handle the exception
+            return false;
+          }
+        }
       }
     }
+  }
 }
