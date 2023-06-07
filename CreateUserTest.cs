@@ -20,12 +20,13 @@ namespace Company.Test
     }
 
     [Fact]
-    public async Task NotImplementedYet()
+    public async Task FirebaseNotAuthorized()
     {
-      const string input = "3/11/2022";
-      var request = TestFactory.CreateHttpRequest("input", input, "post");
+      const string userKey = "RandomRandomRandomRandomRandomRandom";
+      var request = TestFactory.CreateHttpRequest("UserKey", userKey, "post");
       var response = (ObjectResult)await CreateUser.CreateUserWithUserKey(request, logger);
-      Assert.Equal(200, response.StatusCode);
+      Assert.Equal(400, response.StatusCode);
+      Assert.Equal("UserKeyNotAuth", response.Value);
     }
   }
 }
