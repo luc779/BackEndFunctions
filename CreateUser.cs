@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using FirebaseAdmin.Auth;
 using MySqlConnector;
+using Company.Function;
 
 namespace Company
 {
@@ -59,13 +60,10 @@ namespace Company
     }
 
     private static bool AddUserToDatabase(string hashedUserKey) {
-      string server = "databaseht.cyethqvobvkg.us-west-2.rds.amazonaws.com";
-      string database = "Hackathon";
-      string uid = "masterUsername";
-      string password = "vafwa4-vozqyn-naxqAb";
-      string connectionString = "server=" + server + ";uid=" + uid +";pwd=" + password + ";database=" + database;
 
-      using (MySqlConnection connection = new MySqlConnection(connectionString))
+      MySqlConnection connection = DatabaseConnecter.MySQLDatabase();
+
+      using (connection)
       {
         connection.Open();
 
