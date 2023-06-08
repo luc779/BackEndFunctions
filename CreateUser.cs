@@ -75,8 +75,9 @@ namespace Company
             // Selet UserKey from Users where UserKey is equal to hashedUserKey
             using (MySqlCommand command = connection.CreateCommand())
             {
+              string query = "SELECT USERKEY FROM Users WHERE UserKey = '" + hashedUserKey + "'";
               command.Transaction = transaction;
-              command.CommandText = "SELECT USERKEY FROM Users WHERE UserKey = '" + hashedUserKey + "'";
+              command.CommandText = query;
               using MySqlDataReader reader = command.ExecuteReader();
               if (reader.HasRows) {
                 return true;
@@ -86,9 +87,10 @@ namespace Company
             // Insert a user to Users table with the hashedUserKey
             using (MySqlCommand command = connection.CreateCommand())
             {
-              string query = "INSERT INTO Users (USERKEY) Values (@USERKEY)";
+              const string userKey = "@USERKEY";
+              const string query = "INSERT INTO Users (USERKEY) Values ("+ userKey +")";
               command.CommandText = query;
-              command.Parameters.AddWithValue("@USERKEY", hashedUserKey);
+              command.Parameters.AddWithValue(userKey, hashedUserKey);
               command.ExecuteNonQuery();
             }
 
