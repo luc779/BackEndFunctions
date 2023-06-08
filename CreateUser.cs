@@ -1,0 +1,115 @@
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.Functions.Worker;
+using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Http;
+using Newtonsoft.Json;
+using FirebaseAdmin.Auth;
+using MySqlConnector;
+
+namespace Company
+{
+  public static class CreateUser
+  {
+    static CreateUser()
+    {
+        FirebaseInitializer.Initialize();
+    }
+
+    [Function("CreateUser")]
+    public static async Task<IActionResult> CreateUserWithUserKey(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "create-user")] HttpRequest req,
+        ILogger log)
+    {
+      try
+      {
+        // Get post body if any
+        string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+        dynamic data = JsonConvert.DeserializeObject(requestBody);
+
+        // Get "input" parameter from HTTP request as either parameter or post value
+        string userKey = req.Query["UserKey"];
+        userKey = userKey ?? data?.UserKey;
+
+        UserRecord userRecord = await FirebaseAuth.DefaultInstance.GetUserAsync(userKey);
+        // See the UserRecord reference doc for the contents of userRecord.
+
+        try
+        {
+          // Hash the userKey
+          string hashedUserKey = BCrypt.Net.BCrypt.HashPassword(userKey);
+
+          // Check if the database has a user with the same hashedUserKey
+          bool isUserAdded = AddUserToDatabase(hashedUserKey);
+          if (isUserAdded) {
+            return new OkObjectResult("Success");
+          }
+
+          // For some reason, the userkey is not added to the database
+          return new BadRequestObjectResult("InternalError");
+        } catch (Exception e) {
+          return new BadRequestObjectResult("InternalError");
+        }
+
+      } catch (ArgumentException argError) {
+        return new BadRequestObjectResult("InvalidArgument");
+      } catch (FirebaseAuthException authError) {
+        return new BadRequestObjectResult("UserKeyNotAuth");
+      }
+      throw new NotImplementedException();
+    }
+
+    private static bool AddUserToDatabase(string hashedUserKey) {
+      string server = "databaseht.cyethqvobvkg.us-west-2.rds.amazonaws.com";
+      string database = "Hackathon";
+      string uid = "masterUsername";
+      string password = "vafwa4-vozqyn-naxqAb";
+      string connectionString = "server=" + server + ";uid=" + uid +";pwd=" + password + ";database=" + database;
+
+      using (MySqlConnection connection = new MySqlConnection(connectionString))
+      {
+        connection.Open();
+
+        // Start the transaction
+        using (MySqlTransaction transaction = connection.BeginTransaction())
+        {
+          try
+          {
+            // Selet UserKey from Users where UserKey is equal to hashedUserKey
+            using (MySqlCommand command = connection.CreateCommand())
+            {
+              command.Transaction = transaction;
+              command.CommandText = "SELECT USERKEY FROM Users WHERE UserKey = '" + hashedUserKey + "'";
+              using MySqlDataReader reader = command.ExecuteReader();
+              if (reader.HasRows) {
+                return true;
+              }
+            }
+
+            // Insert a user to Users table with the hashedUserKey
+            using (MySqlCommand command = connection.CreateCommand())
+            {
+              string query = "INSERT INTO Users (USERKEY) Values (@USERKEY)";
+              command.CommandText = query;
+              command.Parameters.AddWithValue("@USERKEY", hashedUserKey);
+              command.ExecuteNonQuery();
+            }
+
+            // Commit the transaction
+            transaction.Commit();
+
+            // Transaction completed successfully
+            return true;
+          }
+          catch (Exception ex)
+          {
+            // An error occurred, rollback the transaction
+            transaction.Rollback();
+
+            // Handle the exception
+            return false;
+          }
+        }
+      }
+    }
+  }
+}
