@@ -47,13 +47,13 @@ namespace Company
 
           // For some reason, the userkey is not added to the database
           return new BadRequestObjectResult("InternalError");
-        } catch (Exception e) {
+        } catch (Exception) {
           return new BadRequestObjectResult("InternalError");
         }
 
-      } catch (ArgumentException argError) {
+      } catch (ArgumentException) {
         return new BadRequestObjectResult("InvalidArgument");
-      } catch (FirebaseAuthException authError) {
+      } catch (FirebaseAuthException) {
         return new BadRequestObjectResult("UserKeyNotAuth");
       }
       throw new NotImplementedException();
@@ -98,7 +98,7 @@ namespace Company
             // Transaction completed successfully
             return true;
           }
-          catch (Exception ex)
+          catch (Exception)
           {
             // An error occurred, rollback the transaction
             transaction.Rollback();
