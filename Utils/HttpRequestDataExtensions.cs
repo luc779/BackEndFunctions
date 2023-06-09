@@ -5,7 +5,7 @@ namespace NoCO2.Util;
 
 public static class HttpRequestDataExtensions
 {
-    public static void TryParseJson<TOutputType>(this Stream @this, out TOutputType? result)
+    public static void TryParseJson<TOutputType>(this Stream @this, out TOutputType result)
     {
         using var streamReader = new StreamReader(@this, encoding: Encoding.UTF8);
         var json = streamReader.ReadToEnd();
