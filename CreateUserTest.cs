@@ -28,11 +28,13 @@ namespace NoCO2.Test
       Assert.Equal("InvalidArgument", await response.GetResponseBody());
     }
 
-    [Fact]
-    public async Task EmptyBodyUserKey()
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    public async Task EmptyBodyUserKey(string userKey)
     {
       var user = new CreateUserBody{
-        UserKey = null
+        UserKey = userKey
       };
       string body = JsonConvert.SerializeObject(user);
 
