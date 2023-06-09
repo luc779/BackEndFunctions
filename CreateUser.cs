@@ -1,14 +1,17 @@
+using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
+using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using FirebaseAdmin.Auth;
 using MySqlConnector;
+using NoCO2.Util;
 
 namespace Company
 {
-  public static class CreateUser
+  public class CreateUser
   {
     static CreateUser()
     {
@@ -16,19 +19,15 @@ namespace Company
     }
 
     [Function("CreateUser")]
-    public static async Task<IActionResult> CreateUserWithUserKey(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "create-user")] HttpRequest req,
-        ILogger log)
+    public async Task<HttpResponseData> CreateUserWithUserKey(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "create-user")] HttpRequestData req)
     {
       try
       {
-        // Get post body if any
-        string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-        dynamic data = JsonConvert.DeserializeObject(requestBody);
+        req.Body.TryParseJson<User>(out var requestBody);
 
-        // Get "input" parameter from HTTP request as either parameter or post value
-        string userKey = req.Query["UserKey"];
-        userKey = userKey ?? data?.UserKey;
+        // Get "UserKey" parameter from HTTP request as either parameter or post value
+        string userKey = requestBody?.UserKey;
 
         UserRecord userRecord = await FirebaseAuth.DefaultInstance.GetUserAsync(userKey);
         // See the UserRecord reference doc for the contents of userRecord.
@@ -41,24 +40,24 @@ namespace Company
           // Check if the database has a user with the same hashedUserKey
           bool isUserAdded = AddUserToDatabase(hashedUserKey);
           if (isUserAdded) {
-            return new OkObjectResult("Success");
+            return HttpResponseDataFactory.GetHttpResponseData(req, HttpStatusCode.OK, "Success");
           }
 
           // For some reason, the userkey is not added to the database
-          return new BadRequestObjectResult("InternalError");
+          return HttpResponseDataFactory.GetHttpResponseData(req, HttpStatusCode.InternalServerError, "InternalError");
         } catch (Exception e) {
-          return new BadRequestObjectResult("InternalError");
+          return HttpResponseDataFactory.GetHttpResponseData(req, HttpStatusCode.InternalServerError, "InternalError");
         }
 
       } catch (ArgumentException argError) {
-        return new BadRequestObjectResult("InvalidArgument");
+        return HttpResponseDataFactory.GetHttpResponseData(req, HttpStatusCode.BadRequest, "InvalidArgument");
       } catch (FirebaseAuthException authError) {
-        return new BadRequestObjectResult("UserKeyNotAuth");
+        return HttpResponseDataFactory.GetHttpResponseData(req, HttpStatusCode.BadRequest, "UserKeyNotAuth");
       }
       throw new NotImplementedException();
     }
 
-    private static bool AddUserToDatabase(string hashedUserKey) {
+    private bool AddUserToDatabase(string hashedUserKey) {
       string server = "databaseht.cyethqvobvkg.us-west-2.rds.amazonaws.com";
       string database = "Hackathon";
       string uid = "masterUsername";
