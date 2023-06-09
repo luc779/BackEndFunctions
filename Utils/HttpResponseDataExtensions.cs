@@ -1,5 +1,7 @@
 using Microsoft.Azure.Functions.Worker.Http;
 
+namespace NoCO2.Util;
+
 public static class HttpResponseDataExtensions
     {
         public static async Task<string> GetResponseBody(this HttpResponseData response)

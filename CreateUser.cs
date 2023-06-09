@@ -1,15 +1,11 @@
 using System.Net;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
-using Microsoft.Extensions.Logging;
-using Microsoft.AspNetCore.Http;
-using Newtonsoft.Json;
 using FirebaseAdmin.Auth;
 using MySqlConnector;
 using NoCO2.Util;
 
-namespace Company
+namespace NoCO2.Function
 {
   public class CreateUser
   {
@@ -24,35 +20,30 @@ namespace Company
     {
       try
       {
-        req.Body.TryParseJson<User>(out var requestBody);
+        req.Body.TryParseJson<CreateUserBody>(out var requestBody);
 
         // Get "UserKey" parameter from HTTP request as either parameter or post value
         string userKey = requestBody?.UserKey;
 
         UserRecord userRecord = await FirebaseAuth.DefaultInstance.GetUserAsync(userKey);
-        // See the UserRecord reference doc for the contents of userRecord.
 
-        try
-        {
-          // Hash the userKey
-          string hashedUserKey = BCrypt.Net.BCrypt.HashPassword(userKey);
+        // Hash the userKey
+        string hashedUserKey = BCrypt.Net.BCrypt.HashPassword(userKey);
 
-          // Check if the database has a user with the same hashedUserKey
-          bool isUserAdded = AddUserToDatabase(hashedUserKey);
-          if (isUserAdded) {
-            return HttpResponseDataFactory.GetHttpResponseData(req, HttpStatusCode.OK, "Success");
-          }
-
-          // For some reason, the userkey is not added to the database
-          return HttpResponseDataFactory.GetHttpResponseData(req, HttpStatusCode.InternalServerError, "InternalError");
-        } catch (Exception e) {
-          return HttpResponseDataFactory.GetHttpResponseData(req, HttpStatusCode.InternalServerError, "InternalError");
+        // Check if the database has a user with the same hashedUserKey
+        bool isUserAdded = AddUserToDatabase(hashedUserKey);
+        if (isUserAdded) {
+          return HttpResponseDataFactory.GetHttpResponseData(req, HttpStatusCode.OK, "Success");
         }
 
-      } catch (ArgumentException argError) {
+        // For some reason, the userkey is not added to the database
+        return HttpResponseDataFactory.GetHttpResponseData(req, HttpStatusCode.InternalServerError, "InternalError");
+      } catch (ArgumentException) {
         return HttpResponseDataFactory.GetHttpResponseData(req, HttpStatusCode.BadRequest, "InvalidArgument");
-      } catch (FirebaseAuthException authError) {
+      } catch (FirebaseAuthException) {
         return HttpResponseDataFactory.GetHttpResponseData(req, HttpStatusCode.BadRequest, "UserKeyNotAuth");
+      } catch (Exception) {
+        return HttpResponseDataFactory.GetHttpResponseData(req, HttpStatusCode.InternalServerError, "InternalError");
       }
       throw new NotImplementedException();
     }
@@ -87,6 +78,7 @@ namespace Company
             // Insert a user to Users table with the hashedUserKey
             using (MySqlCommand command = connection.CreateCommand())
             {
+              command.Transaction = transaction;
               string query = "INSERT INTO Users (USERKEY) Values (@USERKEY)";
               command.CommandText = query;
               command.Parameters.AddWithValue("@USERKEY", hashedUserKey);
@@ -99,7 +91,7 @@ namespace Company
             // Transaction completed successfully
             return true;
           }
-          catch (Exception ex)
+          catch (Exception)
           {
             // An error occurred, rollback the transaction
             transaction.Rollback();

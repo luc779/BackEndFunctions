@@ -1,9 +1,11 @@
 using System.Net;
 using Xunit;
+using NoCO2.Function;
 using NoCO2.Test.Util;
+using NoCO2.Util;
 using Newtonsoft.Json;
 
-namespace Company.Test
+namespace NoCO2.Test
 {
   public class CreateUserTest : IClassFixture<CreateUser>
   {
@@ -16,7 +18,7 @@ namespace Company.Test
     [Fact]
     public async Task FirebaseNotAuthorized()
     {
-      var user = new User {
+      var user = new CreateUserBody {
         UserKey = "RandomRandomRandomRandomRandomRandom"
       };
       string body = JsonConvert.SerializeObject(user);
@@ -31,7 +33,7 @@ namespace Company.Test
     [Fact]
     public async Task UserNotExistsInDatabase() {
       // input test userKey
-      var user = new User {
+      var user = new CreateUserBody {
         UserKey = "pGIWAl55j3XH4LFHbXgsdtoM46j2"
       };
       string body = JsonConvert.SerializeObject(user);

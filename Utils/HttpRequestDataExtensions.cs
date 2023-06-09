@@ -1,6 +1,8 @@
 using System.Text;
 using Newtonsoft.Json;
 
+namespace NoCO2.Util;
+
 public static class HttpRequestDataExtensions
 {
     public static void TryParseJson<TOutputType>(this Stream @this, out TOutputType? result)
