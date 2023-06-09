@@ -29,6 +29,21 @@ namespace NoCO2.Test
     }
 
     [Fact]
+    public async Task EmptyBodyUserKey()
+    {
+      var user = new CreateUserBody{
+        UserKey = null
+      };
+      string body = JsonConvert.SerializeObject(user);
+
+      var request = TestFactory.CreateHttpRequest(body, "post");
+      var response = await _createUser.CreateUserWithUserKey(request);
+
+      Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+      Assert.Equal("InvalidArgument", await response.GetResponseBody());
+    }
+
+    [Fact]
     public async Task FirebaseNotAuthorized()
     {
       var user = new CreateUserBody {
