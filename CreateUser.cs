@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using FirebaseAdmin.Auth;
 using MySqlConnector;
+using Company.Function;
 
 namespace Company
 {
@@ -46,26 +47,23 @@ namespace Company
 
           // For some reason, the userkey is not added to the database
           return new BadRequestObjectResult("InternalError");
-        } catch (Exception e) {
+        } catch (Exception) {
           return new BadRequestObjectResult("InternalError");
         }
 
-      } catch (ArgumentException argError) {
+      } catch (ArgumentException) {
         return new BadRequestObjectResult("InvalidArgument");
-      } catch (FirebaseAuthException authError) {
+      } catch (FirebaseAuthException) {
         return new BadRequestObjectResult("UserKeyNotAuth");
       }
       throw new NotImplementedException();
     }
 
     private static bool AddUserToDatabase(string hashedUserKey) {
-      string server = "databaseht.cyethqvobvkg.us-west-2.rds.amazonaws.com";
-      string database = "Hackathon";
-      string uid = "masterUsername";
-      string password = "vafwa4-vozqyn-naxqAb";
-      string connectionString = "server=" + server + ";uid=" + uid +";pwd=" + password + ";database=" + database;
 
-      using (MySqlConnection connection = new MySqlConnection(connectionString))
+      MySqlConnection connection = DatabaseConnecter.MySQLDatabase();
+
+      using (connection)
       {
         connection.Open();
 
@@ -77,8 +75,9 @@ namespace Company
             // Selet UserKey from Users where UserKey is equal to hashedUserKey
             using (MySqlCommand command = connection.CreateCommand())
             {
+              string query = "SELECT USERKEY FROM Users WHERE UserKey = '" + hashedUserKey + "'";
               command.Transaction = transaction;
-              command.CommandText = "SELECT USERKEY FROM Users WHERE UserKey = '" + hashedUserKey + "'";
+              command.CommandText = query;
               using MySqlDataReader reader = command.ExecuteReader();
               if (reader.HasRows) {
                 return true;
@@ -88,9 +87,10 @@ namespace Company
             // Insert a user to Users table with the hashedUserKey
             using (MySqlCommand command = connection.CreateCommand())
             {
-              string query = "INSERT INTO Users (USERKEY) Values (@USERKEY)";
+              const string userKey = "@USERKEY";
+              const string query = "INSERT INTO Users (USERKEY) Values ("+ userKey +")";
               command.CommandText = query;
-              command.Parameters.AddWithValue("@USERKEY", hashedUserKey);
+              command.Parameters.AddWithValue(userKey, hashedUserKey);
               command.ExecuteNonQuery();
             }
 
@@ -100,7 +100,7 @@ namespace Company
             // Transaction completed successfully
             return true;
           }
-          catch (Exception ex)
+          catch (Exception)
           {
             // An error occurred, rollback the transaction
             transaction.Rollback();
