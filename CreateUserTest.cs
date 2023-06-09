@@ -1,42 +1,78 @@
-using System;
-using Microsoft.Extensions.Logging;
+using System.Net;
 using Xunit;
-using Xunit.Abstractions;
-using Microsoft.AspNetCore.Mvc;
-using Company;
-using System.Collections.Generic;
-using Microsoft.Extensions.Primitives;
+using NoCO2.Function;
+using NoCO2.Test.Util;
+using NoCO2.Util;
+using Newtonsoft.Json;
 
-
-namespace Company.Test
+namespace NoCO2.Test
 {
-  public class CreateUserTest
+  public class CreateUserTest : IClassFixture<CreateUser>
   {
-    private readonly ILogger logger = TestFactory.CreateLogger();
-    private readonly ITestOutputHelper output;
-    public CreateUserTest(ITestOutputHelper output)
+    private readonly CreateUser _createUser;
+    public CreateUserTest(CreateUser createUser)
     {
-        this.output = output;
+        _createUser = createUser;
+    }
+
+    [Fact]
+    public async Task EmptyBody()
+    {
+      var user = new CreateUserBody{};
+      string body = JsonConvert.SerializeObject(user);
+
+      var request = TestFactory.CreateHttpRequest(body, "post");
+      var response = await _createUser.CreateUserWithUserKey(request);
+
+      Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+      Assert.Equal("InvalidArgument", await response.GetResponseBody());
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    public async Task EmptyBodyUserKey(string userKey)
+    {
+      var user = new CreateUserBody{
+        UserKey = userKey
+      };
+      string body = JsonConvert.SerializeObject(user);
+
+      var request = TestFactory.CreateHttpRequest(body, "post");
+      var response = await _createUser.CreateUserWithUserKey(request);
+
+      Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+      Assert.Equal("InvalidArgument", await response.GetResponseBody());
     }
 
     [Fact]
     public async Task FirebaseNotAuthorized()
     {
-      const string userKey = "RandomRandomRandomRandomRandomRandom";
-      var request = TestFactory.CreateHttpRequest("UserKey", userKey, "post");
-      var response = (ObjectResult)await CreateUser.CreateUserWithUserKey(request, logger);
-      Assert.Equal(400, response.StatusCode);
-      Assert.Equal("UserKeyNotAuth", response.Value);
+      var user = new CreateUserBody {
+        UserKey = "RandomRandomRandomRandomRandomRandom"
+      };
+      string body = JsonConvert.SerializeObject(user);
+
+      var request = TestFactory.CreateHttpRequest(body, "post");
+      var response = await _createUser.CreateUserWithUserKey(request);
+
+      Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+      Assert.Equal("UserKeyNotAuth", await response.GetResponseBody());
     }
 
     [Fact]
     public async Task UserNotExistsInDatabase() {
       // input test userKey
-      const string userKey = "pGIWAl55j3XH4LFHbXgsdtoM46j2";
-      var request = TestFactory.CreateHttpRequest("UserKey", userKey, "post");
-      var response = (ObjectResult)await CreateUser.CreateUserWithUserKey(request, logger);
-      Assert.Equal(200, response.StatusCode);
-      Assert.Equal("Success", response.Value);
+      var user = new CreateUserBody {
+        UserKey = "pGIWAl55j3XH4LFHbXgsdtoM46j2"
+      };
+      string body = JsonConvert.SerializeObject(user);
+
+      var request = TestFactory.CreateHttpRequest(body, "post");
+      var response = await _createUser.CreateUserWithUserKey(request);
+
+      Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+      Assert.Equal("Success", await response.GetResponseBody());
     }
   }
 }

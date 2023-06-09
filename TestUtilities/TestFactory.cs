@@ -2,65 +2,27 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Primitives;
+using Microsoft.Azure.Functions.Worker.Http;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Company.Test
+namespace NoCO2.Test.Util
 {
     public static class TestFactory
     {
-        public static IEnumerable<object[]> Data()
+        private static Dictionary<string, string> CreateDictionary(string key, string value)
         {
-            return new List<object[]>
-            {
-                new object[] { "name", "Bill" },
-                new object[] { "name", "Paul" },
-                new object[] { "name", "Steve" }
-            };
-        }
-
-        private static Dictionary<string, StringValues> CreateDictionary(string key, string value)
-        {
-            var qs = new Dictionary<string, StringValues>
+            var qs = new Dictionary<string, string>
             {
                 { key, value }
             };
             return qs;
         }
 
-        public static HttpRequest CreateHttpRequest(string queryStringKey, string queryStringValue, string method = "get")
+        public static HttpRequestData CreateHttpRequest(string body, string method = "get")
         {
-            var context = new DefaultHttpContext();
-            var request = context.Request;
-            request.Query = new QueryCollection(CreateDictionary(queryStringKey, queryStringValue));
-            request.Method = method;
-            return request;
-        }
-
-        public static HttpRequest CreateHttpRequest(Dictionary<string,StringValues> query, string method = "get")
-        {
-            var context = new DefaultHttpContext();
-            var request = context.Request;
-            request.Query = new QueryCollection(query);
-            request.Method = method;
-            return request;
-        }
-
-        public static ILogger CreateLogger(LoggerTypes type = LoggerTypes.Null)
-        {
-            ILogger logger;
-
-            if (type == LoggerTypes.List)
-            {
-                logger = new ListLogger();
-            }
-            else
-            {
-                logger = NullLoggerFactory.Instance.CreateLogger("Null Logger");
-            }
-
-            return logger;
+            return new MockHttpRequestData(body,method);
         }
     }
 }
