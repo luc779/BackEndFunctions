@@ -5,10 +5,11 @@ namespace NoCO2.Util;
 
 public static class HttpResponseDataFactory
 {
-  public static HttpResponseData GetHttpResponseData(HttpRequestData req, HttpStatusCode statusCode, string body) {
+  public static async Task<HttpResponseData> GetHttpResponseData(HttpRequestData req, HttpStatusCode statusCode, string body) {
     var response = req.CreateResponse(statusCode);
+    response.Headers ??= new HttpHeadersCollection();
     response.Headers.Add("Content-Type", "text/plain; charset=utf-8");
-    response.WriteStringAsync(body);
+    await response.WriteStringAsync(body);
     return response;
   }
 }

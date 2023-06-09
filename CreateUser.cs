@@ -34,21 +34,22 @@ namespace NoCO2.Function
         // Check if the database has a user with the same hashedUserKey
         bool isUserAdded = AddUserToDatabase(hashedUserKey);
         if (isUserAdded) {
-          return HttpResponseDataFactory.GetHttpResponseData(req, HttpStatusCode.OK, "Success");
+          return await HttpResponseDataFactory.GetHttpResponseData(req, HttpStatusCode.OK, "Success");
         }
 
         // For some reason, the userkey is not added to the database
-        return HttpResponseDataFactory.GetHttpResponseData(req, HttpStatusCode.InternalServerError, "InternalError");
+        return await HttpResponseDataFactory.GetHttpResponseData(req, HttpStatusCode.InternalServerError, "InternalError");
       } catch (ArgumentException) {
-        return HttpResponseDataFactory.GetHttpResponseData(req, HttpStatusCode.BadRequest, "InvalidArgument");
+        return await HttpResponseDataFactory.GetHttpResponseData(req, HttpStatusCode.BadRequest, "InvalidArgument");
       } catch (FirebaseAuthException) {
-        return HttpResponseDataFactory.GetHttpResponseData(req, HttpStatusCode.BadRequest, "UserKeyNotAuth");
+        return await HttpResponseDataFactory.GetHttpResponseData(req, HttpStatusCode.BadRequest, "UserKeyNotAuth");
       } catch (Exception) {
-        return HttpResponseDataFactory.GetHttpResponseData(req, HttpStatusCode.InternalServerError, "InternalError");
+        return await HttpResponseDataFactory.GetHttpResponseData(req, HttpStatusCode.InternalServerError, "InternalError");
       }
       throw new NotImplementedException();
     }
 
+    // TODO: Move all Database related tasks into one class
     private bool AddUserToDatabase(string hashedUserKey)
     {
       using (MySqlConnection connection = DatabaseConnecter.MySQLDatabase())

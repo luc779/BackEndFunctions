@@ -23,7 +23,7 @@ public static class HttpRequestDataExtensions
         catch (Exception ex) when(ex is JsonSerializationException or JsonReaderException)
         {
             result = default;
-            throw new ArgumentException(ex.Message);
+            throw new ArgumentException("Invalid Json", ex.Message);
         }
     }
 }
