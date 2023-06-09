@@ -4,6 +4,7 @@ using Microsoft.Azure.Functions.Worker.Http;
 using FirebaseAdmin.Auth;
 using MySqlConnector;
 using NoCO2.Util;
+using Company.Function;
 
 namespace NoCO2.Function
 {
@@ -48,14 +49,9 @@ namespace NoCO2.Function
       throw new NotImplementedException();
     }
 
-    private bool AddUserToDatabase(string hashedUserKey) {
-      string server = "databaseht.cyethqvobvkg.us-west-2.rds.amazonaws.com";
-      string database = "Hackathon";
-      string uid = "masterUsername";
-      string password = "vafwa4-vozqyn-naxqAb";
-      string connectionString = "server=" + server + ";uid=" + uid +";pwd=" + password + ";database=" + database;
-
-      using (MySqlConnection connection = new MySqlConnection(connectionString))
+    private bool AddUserToDatabase(string hashedUserKey)
+    {
+      using (MySqlConnection connection = DatabaseConnecter.MySQLDatabase())
       {
         connection.Open();
 
