@@ -5,6 +5,7 @@ using FirebaseAdmin.Auth;
 using MySqlConnector;
 using NoCO2.Util;
 using Company.Function;
+using Newtonsoft.Json;
 
 namespace NoCO2.Function
 {
@@ -19,6 +20,9 @@ namespace NoCO2.Function
     public async Task<HttpResponseData> CreateUserWithUserKey(
         [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "create-user")] HttpRequestData req)
     {
+      var responseBodyObject = new {
+        reply = "InternalError"
+      };
       try
       {
         req.Body.TryParseJson<CreateUserBody>(out var requestBody);
@@ -34,17 +38,26 @@ namespace NoCO2.Function
         // Check if the database has a user with the same hashedUserKey
         bool isUserAdded = AddUserToDatabase(hashedUserKey);
         if (isUserAdded) {
-          return await HttpResponseDataFactory.GetHttpResponseData(req, HttpStatusCode.OK, "Success");
+          responseBodyObject = new {
+            reply = "Success"
+          };
+          return await HttpResponseDataFactory.GetHttpResponseData(req, HttpStatusCode.OK, responseBodyObject);
         }
 
         // For some reason, the userkey is not added to the database
-        return await HttpResponseDataFactory.GetHttpResponseData(req, HttpStatusCode.InternalServerError, "InternalError");
+        return await HttpResponseDataFactory.GetHttpResponseData(req, HttpStatusCode.InternalServerError, responseBodyObject);
       } catch (ArgumentException) {
-        return await HttpResponseDataFactory.GetHttpResponseData(req, HttpStatusCode.BadRequest, "InvalidArgument");
+        responseBodyObject = new {
+          reply = "InvalidArgument"
+        };
+        return await HttpResponseDataFactory.GetHttpResponseData(req, HttpStatusCode.BadRequest, responseBodyObject);
       } catch (FirebaseAuthException) {
-        return await HttpResponseDataFactory.GetHttpResponseData(req, HttpStatusCode.BadRequest, "UserKeyNotAuth");
+        responseBodyObject = new {
+          reply = "UserKeyNotAuth"
+        };
+        return await HttpResponseDataFactory.GetHttpResponseData(req, HttpStatusCode.BadRequest, responseBodyObject);
       } catch (Exception) {
-        return await HttpResponseDataFactory.GetHttpResponseData(req, HttpStatusCode.InternalServerError, "InternalError");
+        return await HttpResponseDataFactory.GetHttpResponseData(req, HttpStatusCode.InternalServerError, responseBodyObject);
       }
       throw new NotImplementedException();
     }

@@ -25,7 +25,7 @@ namespace NoCO2.Test
       var response = await _createUser.CreateUserWithUserKey(request);
 
       Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-      Assert.Equal("InvalidArgument", await response.GetResponseBody());
+      Assert.Equal("{\"reply\":\"InvalidArgument\"}", await response.GetResponseBody());
     }
 
     [Theory]
@@ -42,7 +42,7 @@ namespace NoCO2.Test
       var response = await _createUser.CreateUserWithUserKey(request);
 
       Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-      Assert.Equal("InvalidArgument", await response.GetResponseBody());
+      Assert.Equal("{\"reply\":\"InvalidArgument\"}", await response.GetResponseBody());
     }
 
     [Fact]
@@ -57,7 +57,7 @@ namespace NoCO2.Test
       var response = await _createUser.CreateUserWithUserKey(request);
 
       Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-      Assert.Equal("UserKeyNotAuth", await response.GetResponseBody());
+      Assert.Equal("{\"reply\":\"UserKeyNotAuth\"}", await response.GetResponseBody());
     }
 
     [Fact]
@@ -72,7 +72,7 @@ namespace NoCO2.Test
       var response = await _createUser.CreateUserWithUserKey(request);
 
       Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-      Assert.Equal("Success", await response.GetResponseBody());
+      Assert.Equal("{\"reply\":\"Success\"}", await response.GetResponseBody());
     }
   }
 }
