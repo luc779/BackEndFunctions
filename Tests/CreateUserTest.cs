@@ -2,7 +2,6 @@ using System.Net;
 using Xunit;
 using NoCO2.Function;
 using NoCO2.Test.Util;
-using NoCO2.Util;
 using Newtonsoft.Json;
 
 namespace NoCO2.Test
@@ -18,7 +17,7 @@ namespace NoCO2.Test
     [Fact]
     public async Task EmptyBody()
     {
-      var user = new CreateUserBody{};
+      var user = new {};
       string body = JsonConvert.SerializeObject(user);
 
       var request = TestFactory.CreateHttpRequest(body, "post");
@@ -33,7 +32,7 @@ namespace NoCO2.Test
     [InlineData("")]
     public async Task EmptyBodyUserKey(string userKey)
     {
-      var user = new CreateUserBody{
+      var user = new {
         UserKey = userKey
       };
       string body = JsonConvert.SerializeObject(user);
@@ -48,7 +47,7 @@ namespace NoCO2.Test
     [Fact]
     public async Task FirebaseNotAuthorized()
     {
-      var user = new CreateUserBody {
+      var user = new {
         UserKey = "RandomRandomRandomRandomRandomRandom"
       };
       string body = JsonConvert.SerializeObject(user);
@@ -61,9 +60,10 @@ namespace NoCO2.Test
     }
 
     [Fact]
-    public async Task UserNotExistsInDatabase() {
+    public async Task UserNotExistsInDatabase()
+    {
       // input test userKey
-      var user = new CreateUserBody {
+      var user = new {
         UserKey = "pGIWAl55j3XH4LFHbXgsdtoM46j2"
       };
       string body = JsonConvert.SerializeObject(user);
