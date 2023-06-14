@@ -13,5 +13,20 @@ namespace NoCO2.Test
     {
       _getEmissionHistory = getEmissionHistory;
     }
+
+    [Fact]
+    public async Task UserNotFound()
+    {
+      var user = new {
+        UserKey = "RandomRandomRandomRandomRandomRandom"
+      };
+      string body = JsonConvert.SerializeObject(user);
+
+      var request = TestFactory.CreateHttpRequest(body, "get");
+      var response = await _getEmissionHistory.GetEmissionHistoryWithUserKey(request);
+
+      Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+      Assert.Equal("{\"reply\":\"UserKeyNotAuth\"}", await response.GetResponseBody());
+    }
   }
 }
