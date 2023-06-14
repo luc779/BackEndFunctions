@@ -15,6 +15,29 @@ namespace NoCO2.Test
     }
 
     [Fact]
+    public void CorrectHashUserKey()
+    {
+      string userKey = "RandomRandomRandomRandomRandom";
+      string hashedUserKey = BCrypt.Net.BCrypt.HashPassword(userKey);
+
+      bool isMatched = BCrypt.Net.BCrypt.Verify(userKey, hashedUserKey);
+
+      Assert.True(isMatched);
+    }
+
+    [Fact]
+    public void IncorrectHashUserKey()
+    {
+      string userKey1 = "RandomRandomRandomRandomRandom";
+      string userKey2 = "IncorrectIncorrectIncorrectIncorrect";
+      string hashedUserKey = BCrypt.Net.BCrypt.HashPassword(userKey1);
+
+      bool isMatched = BCrypt.Net.BCrypt.Verify(userKey2, hashedUserKey);
+
+      Assert.False(isMatched);
+    }
+
+    [Fact]
     public async Task EmptyBody()
     {
       var user = new {};

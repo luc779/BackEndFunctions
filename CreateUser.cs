@@ -36,7 +36,7 @@ namespace NoCO2.Function
         string hashedUserKey = BCrypt.Net.BCrypt.HashPassword(userKey);
 
         // Check if the database has a user with the same hashedUserKey
-        bool isUserAdded = AddUserToDatabase(hashedUserKey);
+        bool isUserAdded = AddUserToDatabase(userKey, hashedUserKey);
         if (isUserAdded) {
           responseBodyObject = new {
             reply = "Success"
@@ -63,7 +63,7 @@ namespace NoCO2.Function
     }
 
     // TODO: Move all Database related tasks into one class
-    private static bool AddUserToDatabase(string hashedUserKey) {
+    private static bool AddUserToDatabase(string originalUserKey, string hashedUserKey) {
 
       MySqlConnection connection = DatabaseConnecter.MySQLDatabase();
 
@@ -79,12 +79,18 @@ namespace NoCO2.Function
             // Selet UserKey from Users where UserKey is equal to hashedUserKey
             using (MySqlCommand command = connection.CreateCommand())
             {
-              string query = "SELECT USERKEY FROM Users WHERE UserKey = '" + hashedUserKey + "'";
+              string query = "SELECT USERKEY FROM Users";
               command.Transaction = transaction;
               command.CommandText = query;
               using MySqlDataReader reader = command.ExecuteReader();
               if (reader.HasRows) {
-                return true;
+                while (reader.Read())
+                {
+                  string hashedUserKeyInDB = reader.GetString(0);
+                  if (BCrypt.Net.BCrypt.Verify(originalUserKey, hashedUserKeyInDB)) {
+                    return true;
+                  }
+                }
               }
             }
 
