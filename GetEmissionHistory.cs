@@ -47,15 +47,15 @@ namespace NoCO2.Function
         {
           using (MySqlCommand command = connection.CreateCommand())
           {
-            string query = "SELECT USERKEY FROM Users";
+            string query = "SELECT ID, USERKEY FROM Users";
             command.CommandText = query;
             using MySqlDataReader reader = command.ExecuteReader();
             if (reader.HasRows) {
               while (reader.Read())
               {
-                string hashedUserKeyInDB = reader.GetString(0);
+                string hashedUserKeyInDB = reader.GetString(1);
                 if (BCrypt.Net.BCrypt.Verify(userKey, hashedUserKeyInDB)) {
-                  return hashedUserKeyInDB;
+                  return reader.GetString(0);
                 }
               }
             }
