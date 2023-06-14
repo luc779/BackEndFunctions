@@ -26,7 +26,7 @@ namespace NoCO2.Test
       var response = await _getEmissionHistory.GetEmissionHistoryWithUserKey(request);
 
       Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-      Assert.Equal("{\"reply\":\"UserKeyNotAuth\"}", await response.GetResponseBody());
+      Assert.Equal("{\"reply\":\"UserNotFound\"}", await response.GetResponseBody());
     }
   }
 }

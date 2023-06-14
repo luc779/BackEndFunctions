@@ -15,7 +15,56 @@ namespace NoCO2.Function
     public async Task<HttpResponseData> GetEmissionHistoryWithUserKey(
         [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "get-emission-history")] HttpRequestData req)
     {
+      try
+      {
+        req.Body.TryParseJson<GeneralUserKeyBody>(out var requestBody);
+
+        // Get "UserKey" parameter from HTTP request as either parameter or post value
+        string userKey = requestBody?.UserKey;
+        bool isMatched = CheckIfUserKeyExistsInDB(userKey);
+
+        if (!isMatched)
+        {
+          var responseBodyObject = new {
+            reply = "UserNotFound"
+          };
+          return await HttpResponseDataFactory.GetHttpResponseData(req, HttpStatusCode.BadRequest, responseBodyObject);
+        }
+      } catch (Exception) {
+
+      }
       throw new NotImplementedException();
+    }
+
+    private bool CheckIfUserKeyExistsInDB(string userKey) {
+      MySqlConnection connection = DatabaseConnecter.MySQLDatabase();
+
+      using (connection)
+      {
+        connection.Open();
+
+        try
+        {
+          using (MySqlCommand command = connection.CreateCommand())
+          {
+            string query = "SELECT USERKEY FROM Users";
+            command.CommandText = query;
+            using MySqlDataReader reader = command.ExecuteReader();
+            if (reader.HasRows) {
+              while (reader.Read())
+              {
+                string hashedUserKeyInDB = reader.GetString(0);
+                if (BCrypt.Net.BCrypt.Verify(userKey, hashedUserKeyInDB)) {
+                  return true;
+                }
+              }
+            }
+          }
+          return false;
+        } catch (Exception) {
+          return false;
+        }
+      }
     }
   }
 }
