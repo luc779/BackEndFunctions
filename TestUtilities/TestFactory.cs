@@ -9,20 +9,20 @@ using System.Text;
 
 namespace NoCO2.Test.Util
 {
-    public static class TestFactory
+  public static class TestFactory
+  {
+    private static Dictionary<string, string> CreateDictionary(string key, string value)
     {
-        private static Dictionary<string, string> CreateDictionary(string key, string value)
-        {
-            var qs = new Dictionary<string, string>
-            {
-                { key, value }
-            };
-            return qs;
-        }
-
-        public static HttpRequestData CreateHttpRequest(string body, string method = "get")
-        {
-            return new MockHttpRequestData(body,method);
-        }
+      var qs = new Dictionary<string, string>
+      {
+        { key, value }
+      };
+      return qs;
     }
+
+    public static HttpRequestData CreateHttpRequest(string body, string method = "get")
+    {
+      return new MockHttpRequestData(body,method);
+    }
+  }
 }
