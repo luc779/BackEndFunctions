@@ -21,10 +21,11 @@ namespace NoCO2.Function
 
         // Get "UserKey" parameter from HTTP request as either parameter or post value
         string userKey = requestBody?.UserKey;
-        string matchedUserKey = CheckIfUserKeyExistsInDB(userKey);
+        string matchedUserID = CheckIfUserKeyExistsInDB(userKey);
 
-        if (matchedUserKey == null)
+        if (matchedUserID == null)
         {
+          // There is no user that has a matching hashed userkey from input userkey
           var responseBodyObject = new {
             reply = "UserNotFound"
           };

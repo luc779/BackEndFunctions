@@ -28,5 +28,19 @@ namespace NoCO2.Test
       Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
       Assert.Equal("{\"reply\":\"UserNotFound\"}", await response.GetResponseBody());
     }
+
+    [Fact]
+    public async Task GetOneYearOfEmissionHistory()
+    {
+      var user = new {
+        UserKey = "pGIWAl55j3XH4LFHbXgsdtoM46j2"
+      };
+      string body = JsonConvert.SerializeObject(user);
+
+      var request = TestFactory.CreateHttpRequest(body, "get");
+      var response = await _getEmissionHistory.GetEmissionHistoryWithUserKey(request);
+
+      Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+    }
   }
 }
