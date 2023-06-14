@@ -21,9 +21,9 @@ namespace NoCO2.Function
 
         // Get "UserKey" parameter from HTTP request as either parameter or post value
         string userKey = requestBody?.UserKey;
-        bool isMatched = CheckIfUserKeyExistsInDB(userKey);
+        string matchedUserKey = CheckIfUserKeyExistsInDB(userKey);
 
-        if (!isMatched)
+        if (matchedUserKey == null)
         {
           var responseBodyObject = new {
             reply = "UserNotFound"
@@ -36,7 +36,7 @@ namespace NoCO2.Function
       throw new NotImplementedException();
     }
 
-    private bool CheckIfUserKeyExistsInDB(string userKey) {
+    private string CheckIfUserKeyExistsInDB(string userKey) {
       MySqlConnection connection = DatabaseConnecter.MySQLDatabase();
 
       using (connection)
@@ -55,14 +55,14 @@ namespace NoCO2.Function
               {
                 string hashedUserKeyInDB = reader.GetString(0);
                 if (BCrypt.Net.BCrypt.Verify(userKey, hashedUserKeyInDB)) {
-                  return true;
+                  return hashedUserKeyInDB;
                 }
               }
             }
           }
-          return false;
+          return null;
         } catch (Exception) {
-          return false;
+          return null;
         }
       }
     }
