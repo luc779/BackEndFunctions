@@ -10,7 +10,6 @@ namespace Company.Function
 {
     public class SubmitUserActivites
     {
-
         public SubmitUserActivites()
         {
             FirebaseInitializer.Initialize();
@@ -333,7 +332,8 @@ namespace Company.Function
                 using MySqlCommand insertCommand = new(insertQuery, connection);
                 insertCommand.Parameters.AddWithValue("@UserID", ID);
                 insertCommand.Parameters.AddWithValue("@TotalAmount", addedTotalEmissions);
-                // insertCommand.Parameters.AddWithValue("@Goal", goal); // what to do here, let user make goal or set goal from documentation
+                const double goal = 60.4;
+                insertCommand.Parameters.AddWithValue("@Goal", goal);
                 insertCommand.Parameters.AddWithValue("@Date", date);
                 insertCommand.ExecuteNonQuery();
             }
