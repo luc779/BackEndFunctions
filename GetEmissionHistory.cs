@@ -1,4 +1,5 @@
 using System.Net;
+using FirebaseAdmin.Auth;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using MySqlConnector;
@@ -9,6 +10,11 @@ namespace NoCO2.Function
 {
   public class GetEmissionHistory
   {
+    static GetEmissionHistory()
+    {
+      FirebaseInitializer.Initialize();
+    }
+
     private const double EMISSION_GOAL = 7.36;
 
     [Function("GetEmissionHistory")]
@@ -24,9 +30,10 @@ namespace NoCO2.Function
 
         // Get "UserKey" parameter from HTTP request as either parameter or post value
         string userKey = requestBody?.UserKey;
-        string matchedUserID = GetUserIdIfUserKeyExistsInDB(userKey);
+        UserRecord userRecord = await FirebaseAuth.DefaultInstance.GetUserAsync(userKey);
+        int matchedUserID = GetUserIdIfUserKeyExistsInDB(userKey);
 
-        if (matchedUserID == null)
+        if (matchedUserID == -1)
         {
           // There is no user that has a matching hashed userkey from input userkey
           responseBodyObject = new {
@@ -42,13 +49,23 @@ namespace NoCO2.Function
             History = emissionHistory
         };
         return await HttpResponseDataFactory.GetHttpResponseData(req, HttpStatusCode.OK, successResponseBodyObject);
+      } catch (ArgumentException) {
+        responseBodyObject = new {
+          reply = "InvalidArgument"
+        };
+        return await HttpResponseDataFactory.GetHttpResponseData(req, HttpStatusCode.BadRequest, responseBodyObject);
+      } catch (FirebaseAuthException) {
+        responseBodyObject = new {
+          reply = "UserKeyNotAuth"
+        };
+        return await HttpResponseDataFactory.GetHttpResponseData(req, HttpStatusCode.BadRequest, responseBodyObject);
       } catch (Exception) {
         return await HttpResponseDataFactory.GetHttpResponseData(req, HttpStatusCode.InternalServerError, responseBodyObject);
       }
       throw new NotImplementedException();
     }
 
-    private string GetUserIdIfUserKeyExistsInDB(string userKey) {
+    private int GetUserIdIfUserKeyExistsInDB(string userKey) {
       MySqlConnection connection = DatabaseConnecter.MySQLDatabase();
 
       using (connection)
@@ -67,19 +84,19 @@ namespace NoCO2.Function
               {
                 string hashedUserKeyInDB = reader.GetString(1);
                 if (BCrypt.Net.BCrypt.Verify(userKey, hashedUserKeyInDB)) {
-                  return reader.GetString(0);
+                  return reader.GetInt32("ID");
                 }
               }
             }
           }
-          return null;
+          return -1;
         } catch (Exception) {
-          return null;
+          return -1;
         }
       }
     }
 
-    private async Task<List<DailyEmission>> GetDailyEmissionsForUserWithinOneYear(string userId)
+    private async Task<List<DailyEmission>> GetDailyEmissionsForUserWithinOneYear(int userId)
     {
       DateTime currentDate = DateTime.UtcNow;
       DateTime oneYearAgo = currentDate.AddYears(-1);
