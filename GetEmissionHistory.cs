@@ -1,11 +1,9 @@
 using System.Net;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
-using FirebaseAdmin.Auth;
 using MySqlConnector;
 using NoCO2.Util;
 using Company.Function;
-using Newtonsoft.Json;
 
 namespace NoCO2.Function
 {
@@ -17,6 +15,9 @@ namespace NoCO2.Function
     public async Task<HttpResponseData> GetEmissionHistoryWithUserKey(
         [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "get-emission-history")] HttpRequestData req)
     {
+      var responseBodyObject = new {
+        reply = "InternalError"
+      };
       try
       {
         req.Body.TryParseJson<GeneralUserKeyBody>(out var requestBody);
@@ -28,15 +29,21 @@ namespace NoCO2.Function
         if (matchedUserID == null)
         {
           // There is no user that has a matching hashed userkey from input userkey
-          var responseBodyObject = new {
+          responseBodyObject = new {
             reply = "UserNotFound"
           };
           return await HttpResponseDataFactory.GetHttpResponseData(req, HttpStatusCode.BadRequest, responseBodyObject);
         }
 
+        // Format the list of emissions into an object for HttpResponseData
         List<DailyEmission> emissionHistory = await GetDailyEmissionsForUserWithinOneYear(matchedUserID);
+        var successResponseBodyObject = new {
+            reply = "Success",
+            History = emissionHistory
+        };
+        return await HttpResponseDataFactory.GetHttpResponseData(req, HttpStatusCode.OK, successResponseBodyObject);
       } catch (Exception) {
-
+        return await HttpResponseDataFactory.GetHttpResponseData(req, HttpStatusCode.InternalServerError, responseBodyObject);
       }
       throw new NotImplementedException();
     }
@@ -107,33 +114,37 @@ namespace NoCO2.Function
             const string TOTAL_AMOUNT_COL = "TotalAmount";
             const string GOAL_COL = "Goal";
 
-            while (reader.Read())
+            if (reader.HasRows)
             {
-              DateTime dateTime = reader.GetDateTime(DATE_TIME_COL).Date;
-              double total = reader.GetDouble(TOTAL_AMOUNT_COL);
-              double goal = reader.GetDouble(GOAL_COL);
+              while (reader.Read())
+              {
+                DateTime dateTime = reader.GetDateTime(DATE_TIME_COL).Date;
+                double total = reader.GetDouble(TOTAL_AMOUNT_COL);
+                double goal = reader.GetDouble(GOAL_COL);
 
-              emissions.Add(new DailyEmission { DateTime = dateTime, Total = total, Goal = goal });
+                emissions.Add(new DailyEmission { DateTime = dateTime, Total = total, Goal = goal });
+              }
+
+              // Fill in the missing days with null total and default goal
+              const int ZERO_DATE_OFFSET = 0;
+              List<DateTime> allDates = Enumerable.Range(ZERO_DATE_OFFSET, (currentDate - oneYearAgo).Days)
+                  .Select(offset => oneYearAgo.AddDays(offset).Date)
+                  .ToList();
+
+              List<DateTime> existingDates = emissions.Select(e => e.DateTime).ToList();
+
+              List<DateTime> missingDates = allDates.Except(existingDates).ToList();
+
+              emissions.AddRange(missingDates.Select(date => new DailyEmission
+              {
+                DateTime = date,
+                Total = null,
+                Goal = EMISSION_GOAL
+              }));
+
+              return emissions.OrderBy(e => e.DateTime).ToList();
             }
-
-            // Fill in the missing days with null total and default goal
-            const int ZERO_DATE_OFFSET = 0;
-            List<DateTime> allDates = Enumerable.Range(ZERO_DATE_OFFSET, (currentDate - oneYearAgo).Days)
-                .Select(offset => oneYearAgo.AddDays(offset).Date)
-                .ToList();
-
-            List<DateTime> existingDates = emissions.Select(e => e.DateTime).ToList();
-
-            List<DateTime> missingDates = allDates.Except(existingDates).ToList();
-
-            emissions.AddRange(missingDates.Select(date => new DailyEmission
-            {
-              DateTime = date,
-              Total = null,
-              Goal = EMISSION_GOAL
-            }));
-
-            return emissions.OrderBy(e => e.DateTime).ToList();
+            return emissions;
           }
         }
       }
