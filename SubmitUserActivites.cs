@@ -333,7 +333,7 @@ namespace Company.Function
                 using MySqlCommand insertCommand = new(insertQuery, connection);
                 insertCommand.Parameters.AddWithValue("@UserID", ID);
                 insertCommand.Parameters.AddWithValue("@TotalAmount", addedTotalEmissions);
-                // insertCommand.Parameters.AddWithValue("@Goal", goal); // goal issue
+                // insertCommand.Parameters.AddWithValue("@Goal", goal); // what to do here, let user make goal or set goal from documentation
                 insertCommand.Parameters.AddWithValue("@Date", date);
                 insertCommand.ExecuteNonQuery();
             }
