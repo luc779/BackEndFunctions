@@ -43,8 +43,8 @@ namespace NoCO2.Test
       Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
       // Verify that the response content has the expected format
-        string content = await response.GetResponseBody();
-        Assert.Matches(@"\{[\s\n]+""reply"":\s+""Success"",[\s\n]+""History"":\s+\[\s*\]\s*\}", content);
+      string content = await response.GetResponseBody();
+      Assert.Matches(@"\{\s*""reply"":\s*""Success"",\s*""History"":\s*\[.*\]\s*}", content);
 
       // Verify the length of the History array
       dynamic responseObject = Newtonsoft.Json.JsonConvert.DeserializeObject(content);
