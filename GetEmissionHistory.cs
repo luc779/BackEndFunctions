@@ -24,7 +24,7 @@ namespace NoCO2.Function
 
         // Get "UserKey" parameter from HTTP request as either parameter or post value
         string userKey = requestBody?.UserKey;
-        string matchedUserID = CheckIfUserKeyExistsInDB(userKey);
+        string matchedUserID = GetUserIdIfUserKeyExistsInDB(userKey);
 
         if (matchedUserID == null)
         {
@@ -48,7 +48,7 @@ namespace NoCO2.Function
       throw new NotImplementedException();
     }
 
-    private string CheckIfUserKeyExistsInDB(string userKey) {
+    private string GetUserIdIfUserKeyExistsInDB(string userKey) {
       MySqlConnection connection = DatabaseConnecter.MySQLDatabase();
 
       using (connection)
@@ -118,6 +118,7 @@ namespace NoCO2.Function
             {
               while (reader.Read())
               {
+                // Store a list of DailyEmission
                 DateTime dateTime = reader.GetDateTime(DATE_TIME_COL).Date;
                 double total = reader.GetDouble(TOTAL_AMOUNT_COL);
                 double goal = reader.GetDouble(GOAL_COL);
@@ -144,6 +145,7 @@ namespace NoCO2.Function
 
               return emissions.OrderBy(e => e.DateTime).ToList();
             }
+            // Return empty history if there are none within an year
             return emissions;
           }
         }
