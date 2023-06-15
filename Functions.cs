@@ -8,8 +8,21 @@ namespace Company.Function;
         // variable to convert liter to Kg of Co2
         private readonly double literToKgCo2 = 2.68;
 
+        // food emission class used to seperate grams and serving foods
+        class FoodEmission
+        {
+            public int Emission { get; }
+            public bool IsPerServing { get; }
+
+            public FoodEmission(int emission, bool isPerServing)
+            {
+                Emission = emission;
+                IsPerServing = isPerServing;
+            }
+        }
+
         // data for vechile average emissions, values are in g per km
-        readonly Dictionary<string, double> vehicleType = new()
+        readonly Dictionary<string, int> vehicleType = new()
         {
             { "Truck", 372 },
             { "4 Door Petrol Car", 209 },
@@ -24,29 +37,30 @@ namespace Company.Function;
         };
 
         // data for food average emissions, values are in g per 100g
-        readonly Dictionary<string, double> foodEmissions = new()
+        readonly Dictionary<string, FoodEmission> foodEmissions = new()
         {
-            { "Beef", 0.155 },
-            { "Lamb", 0.0584 },
-            { "Prawns", 0.0407 },
-            { "Cheese", 0.0279 },
-            { "Pork", 0.024 },
-            { "Chicken", 0.0182 },
-            { "Fish", 0.0134 },
-            { "Chocolate", 0.019 },
-            { "Egg", 0.0053 },
-            { "Tomato", 0.00213 },
-            { "Berries", 0.001527 },
-            { "Rice", 0.0016 },
-            { "Banana", 0.11 },
-            { "Tofu", 0.0008 },
-            { "Apple", 0.06 },
-            { "Brassicas", 0.0005 },
-            { "Nuts", 0.0005 },
-            { "Orange", 0.05 },
-            { "Potatoes", 0.0005 },
-            { "Root Vegetables", 0.0004 }
+            { "Beef",                     new FoodEmission(15500, false) },
+            { "Lamb",                     new FoodEmission(5840, false) },
+            { "Prawns",                   new FoodEmission(4070, false) },
+            { "Cheese",                   new FoodEmission(2790, false) },
+            { "Pork",                     new FoodEmission(2400, false) },
+            { "Chicken",                  new FoodEmission(1820, false) },
+            { "Fish",                     new FoodEmission(1340, false) },
+            { "Dark Chocolate",           new FoodEmission(950, true) },   // 1 serving
+            { "Eggs",                     new FoodEmission(530, true) },   // 1 egg
+            { "Berries",                  new FoodEmission(220, true) },   // 1 serving
+            { "Rice",                     new FoodEmission(160, false) },
+            { "Banana",                   new FoodEmission(110, true) },   // 1 banana
+            { "Tofu",                     new FoodEmission(80, false) },
+            { "Apple",                    new FoodEmission(60, true) },    // 1 apple
+            { "Brassica, nuts, potatoes", new FoodEmission(50, false) },
+            { "Orange",                   new FoodEmission(50, true) },    // 1 orange
+            { "Root vegetables",          new FoodEmission(40, false) },
+            { "Milk",                     new FoodEmission(800, true) },   // 1 glass
+            { "Soy Milk",                 new FoodEmission(250, true) },   // 1 glass
+            { "Almond Milk",              new FoodEmission(180, true) }    // 1 glass
         };
+
         // data for fabric average emissions, values in kg
         readonly Dictionary<string, double> fabrics = new()
         {
@@ -65,16 +79,25 @@ namespace Company.Function;
             double distanceKm = double.Parse(distance) * 1.609344;
             double gramsOfCo2 = distanceKm * vechileTypeEmission;
             double kgOfCo2 = gramsOfCo2 / 1000;
-            // round up 5 decimals
-            return Math.Ceiling(kgOfCo2 * 100000) / 100000;
+            // round up 10 decimals
+            return Math.Ceiling(kgOfCo2 * 10000000000) / 10000000000;
         }
         // food calculations, returns a string of total emissions from variables
-        public string FoodCalculation(string foodName, string amount)
+        public double FoodCalculation(string foodName, string amount)
         {
-            double emissionPerUnitOfFood = foodEmissions[foodName];
-            double kgOfCo2 = emissionPerUnitOfFood * int.Parse(amount);
-            // double roundUp5Decimals = Math.Ceiling(kgOfCo2 * 100000) / 100000;
-            return kgOfCo2.ToString();
+            FoodEmission foodInfo = foodEmissions[foodName];
+            int grams = foodInfo.Emission;
+            bool isPerServing = foodInfo.IsPerServing;
+            double gramsOfCo2;
+            if (isPerServing) {
+                gramsOfCo2 = grams * double.Parse(amount);
+            } else {
+                double amountPerHundredGrams = double.Parse(amount) / 100.0; // 100 because each grams info is per 100 g
+                gramsOfCo2 = grams * amountPerHundredGrams;
+            }
+            double kgOfCo2 = gramsOfCo2 / 1000;
+            // round up 10 decimals
+            return Math.Ceiling(kgOfCo2 * 10000000000) / 10000000000;
         }
         // clothes calculations, returns a string of total emissions from variables
         public string ClothesCalculation(string clothesMaterial, string amount)
