@@ -8,22 +8,22 @@ namespace Company.Function;
         // variable to convert liter to Kg of Co2
         private readonly double literToKgCo2 = 2.68;
 
-        // data for vechile average emissions, values are in kg
+        // data for vechile average emissions, values are in g per km
         readonly Dictionary<string, double> vehicleType = new()
         {
-            { "Truck", 598.6759702 },
-            { "4 Door Petrol Car", 336.3528972 },
-            { "Medium Diesel-Powered Car", 275.197825 },
-            { "Plane Travel", 234.9642248 },
-            { "Motorbike", 181.8558727 },
-            { "Bus", 165.7624326 },
-            { "Electric Vehicle", 130.3568645 },
-            { "Train Travel", 59.54572821 },
-            { "Ferry", 30.57753611 },
+            { "Truck", 372 },
+            { "4 Door Petrol Car", 209 },
+            { "Medium Diesel-Powered Car", 171 },
+            { "Plane Travel", 146 },
+            { "Motorbike", 113 },
+            { "Bus", 103 },
+            { "Electric Vehicle", 81 },
+            { "Train Travel", 37 },
+            { "Ferry", 19 },
             { "Bike", 0 }
         };
 
-        // data for food average emissions, values are in kg
+        // data for food average emissions, values are in g per 100g
         readonly Dictionary<string, double> foodEmissions = new()
         {
             { "Beef", 0.155 },
@@ -62,9 +62,9 @@ namespace Company.Function;
         public double DrivingCalculation(string vechileType, string distance)
         {
             double vechileTypeEmission = vehicleType[vechileType];
-            double gallons = int.Parse(distance) / vechileTypeEmission; // change vechile emissions to pounds
-            double litersConversion = literInGallon * gallons;
-            double kgOfCo2 = litersConversion * literToKgCo2;
+            double distanceKm = double.Parse(distance) * 1.609344;
+            double gramsOfCo2 = distanceKm * vechileTypeEmission;
+            double kgOfCo2 = gramsOfCo2 / 1000;
             // round up 5 decimals
             return Math.Ceiling(kgOfCo2 * 100000) / 100000;
         }
