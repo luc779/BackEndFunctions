@@ -2,12 +2,6 @@ namespace Company.Function;
 
     internal class Functions
     {
-        // variable to convert gallon to liters
-        private readonly double literInGallon = 4.54;
-
-        // variable to convert liter to Kg of Co2
-        private readonly double literToKgCo2 = 2.68;
-
         // food emission class used to seperate grams and serving foods
         class FoodEmission
         {
@@ -75,10 +69,10 @@ namespace Company.Function;
             double distanceKm = double.Parse(distance) * 1.609344;
             // gram of co2, distance in km * gram per km
             double gramsOfCo2 = distanceKm * vechileTypeEmission;
-            // conver to kg
-            double kgOfCo2 = gramsOfCo2 / 1000;
+            // convert grams to kg, then kg to lbs
+            double lbsOfCo2 = (gramsOfCo2 / 1000) * 2.20462;
             // round up 10 decimals
-            return Math.Ceiling(kgOfCo2 * 10000000000) / 10000000000;
+            return Math.Ceiling(lbsOfCo2 * 10000000000) / 10000000000;
         }
         // food calculations, returns a string of total emissions from variables
         public double FoodCalculation(string foodName, string amount)
@@ -98,10 +92,11 @@ namespace Company.Function;
                 double amountPerHundredGrams = double.Parse(amount) / 100.0; // 100 because each grams info is per 100 g
                 gramsOfCo2 = grams * amountPerHundredGrams;
             }
-            // convert to kg
-            double kgOfCo2 = gramsOfCo2 / 1000;
+            // convert grams to kg, then kg to lbs
+            double lbsOfCo2 = (gramsOfCo2 / 1000) * 2.20462;
+
             // round up 10 decimals
-            return Math.Ceiling(kgOfCo2 * 10000000000) / 10000000000;
+            return Math.Ceiling(lbsOfCo2 * 10000000000) / 10000000000;
         }
         // clothes calculations, returns a string of total emissions from variables
         public double UtilitiesCalculation(string utility, string kWh)
@@ -110,9 +105,9 @@ namespace Company.Function;
             double emissionPerUtility = utilities[utility];
             // hours times to g per hour
             double gramsOfCo2 = emissionPerUtility * int.Parse(kWh);
-            // convert to kg
-            double kgOfCo2 = gramsOfCo2 / 1000;
+            // convert grams to kg, then kg to lbs
+            double lbsOfCo2 = (gramsOfCo2 / 1000) * 2.20462;
             // round up 10 decimals
-            return Math.Ceiling(kgOfCo2 * 10000000000) / 10000000000;
+            return Math.Ceiling(lbsOfCo2 * 10000000000) / 10000000000;
         }
     }
