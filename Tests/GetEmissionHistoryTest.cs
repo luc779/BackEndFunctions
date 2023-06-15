@@ -41,6 +41,16 @@ namespace NoCO2.Test
       var response = await _getEmissionHistory.GetEmissionHistoryWithUserKey(request);
 
       Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+      // Verify that the response content has the expected format
+        string content = await response.GetResponseBody();
+        Assert.Matches(@"\{[\s\n]+""reply"":\s+""Success"",[\s\n]+""History"":\s+\[\s*\]\s*\}", content);
+
+      // Verify the length of the History array
+      dynamic responseObject = Newtonsoft.Json.JsonConvert.DeserializeObject(content);
+      var historyArray = responseObject.History;
+      var expectedLength = (DateTime.Now - DateTime.Now.AddYears(-1)).TotalDays;
+      Assert.Equal(expectedLength, historyArray.Count);
     }
   }
 }
