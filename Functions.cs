@@ -61,23 +61,21 @@ namespace Company.Function;
             { "Almond Milk",              new FoodEmission(180, true) }    // 1 glass
         };
 
-        // data for fabric average emissions, values in kg
-        readonly Dictionary<string, double> fabrics = new()
+        // data for utilities average emissions, values in g per hour
+        readonly Dictionary<string, double> utilities = new()
         {
-            { "Wool", 13.89 },
-            { "Acrylic Fabric", 11.53 },
-            { "Cotton", 8.3 },
-            { "Silk", 7.63 },
-            { "Nylon", 7.31 },
-            { "Polyester", 6.4 },
-            { "Linen", 5.4 }
+            { "Electrivity", 371.03856 }
         };
         // driving calcuation, returns a string of total emissions from varaibles
         public double DrivingCalculation(string vechileType, string distance)
         {
+            // find vechile emission
             double vechileTypeEmission = vehicleType[vechileType];
+            // convert miles to km
             double distanceKm = double.Parse(distance) * 1.609344;
+            // gram of co2, distance in km * gram per km
             double gramsOfCo2 = distanceKm * vechileTypeEmission;
+            // conver to kg
             double kgOfCo2 = gramsOfCo2 / 1000;
             // round up 10 decimals
             return Math.Ceiling(kgOfCo2 * 10000000000) / 10000000000;
@@ -85,26 +83,36 @@ namespace Company.Function;
         // food calculations, returns a string of total emissions from variables
         public double FoodCalculation(string foodName, string amount)
         {
+            // get food info for food name
             FoodEmission foodInfo = foodEmissions[foodName];
+            // get the grams and isPerServing from FoodEmission
             int grams = foodInfo.Emission;
             bool isPerServing = foodInfo.IsPerServing;
+
             double gramsOfCo2;
             if (isPerServing) {
+                // the amount, refers to per serving
                 gramsOfCo2 = grams * double.Parse(amount);
             } else {
+                // amount, refers to grams
                 double amountPerHundredGrams = double.Parse(amount) / 100.0; // 100 because each grams info is per 100 g
                 gramsOfCo2 = grams * amountPerHundredGrams;
             }
+            // convert to kg
             double kgOfCo2 = gramsOfCo2 / 1000;
             // round up 10 decimals
             return Math.Ceiling(kgOfCo2 * 10000000000) / 10000000000;
         }
         // clothes calculations, returns a string of total emissions from variables
-        public string ClothesCalculation(string clothesMaterial, string amount)
+        public double UtilitiesCalculation(string utility, string kWh)
         {
-            double emissionPerFabric = fabrics[clothesMaterial];
-            double kgOfCo2 = emissionPerFabric * int.Parse(amount);
-            // double roundUp5Decimals = Math.Ceiling(kgOfCo2 * 100000) / 100000;
-            return kgOfCo2.ToString();
+            // find the emission for the utility
+            double emissionPerUtility = utilities[utility];
+            // hours times to g per hour
+            double gramsOfCo2 = emissionPerUtility * int.Parse(kWh);
+            // convert to kg
+            double kgOfCo2 = gramsOfCo2 / 1000;
+            // round up 10 decimals
+            return Math.Ceiling(kgOfCo2 * 10000000000) / 10000000000;
         }
     }
