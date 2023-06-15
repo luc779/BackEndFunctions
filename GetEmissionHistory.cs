@@ -82,35 +82,43 @@ namespace NoCO2.Function
       using (connection)
       {
         connection.Open();
+        const string USERID = "@userId";
+        const string ONE_YEAR_AGO = "@oneYearAgo";
+        const string CURRENT_DATE = "@currentDate";
 
-        string query = "SELECT e.DateTime, e.TotalAmount, e.Goal " +
-               "FROM DailyEmission AS e " +
-               "JOIN Users AS u ON e.UserId = u.UserId " +
-               "WHERE u.UserId = @userId AND e.DateTime >= @oneYearAgo AND e.DateTime <= @currentDate " +
-               "ORDER BY e.DateTime ASC";
+        string query = $"SELECT e.DateTime, e.TotalAmount, e.Goal " +
+                      $"FROM DailyEmission AS e " +
+                      $"JOIN Users AS u ON e.UserId = u.UserId " +
+                      $"WHERE u.UserId = {USERID} AND e.DateTime >= {ONE_YEAR_AGO} AND e.DateTime <= {CURRENT_DATE} " +
+                      $"ORDER BY e.DateTime ASC";
+
 
         using (MySqlCommand command = connection.CreateCommand())
         {
           command.CommandText = query;
-          command.Parameters.AddWithValue("@userId", userId);
-          command.Parameters.AddWithValue("@oneYearAgo", oneYearAgo);
-          command.Parameters.AddWithValue("@currentDate", currentDate);
+          command.Parameters.AddWithValue(USERID, userId);
+          command.Parameters.AddWithValue(ONE_YEAR_AGO, oneYearAgo);
+          command.Parameters.AddWithValue(CURRENT_DATE, currentDate);
 
           using (MySqlDataReader reader = await command.ExecuteReaderAsync())
           {
             List<DailyEmission> emissions = new List<DailyEmission>();
+            const string DATE_TIME_COL = "DateTime";
+            const string TOTAL_AMOUNT_COL = "TotalAmount";
+            const string GOAL_COL = "Goal";
 
             while (reader.Read())
             {
-              DateTime dateTime = reader.GetDateTime("DateTime").Date;
-              double total = reader.GetDouble("TotalAmount");
-              double goal = reader.GetDouble("Goal");
+              DateTime dateTime = reader.GetDateTime(DATE_TIME_COL).Date;
+              double total = reader.GetDouble(TOTAL_AMOUNT_COL);
+              double goal = reader.GetDouble(GOAL_COL);
 
               emissions.Add(new DailyEmission { DateTime = dateTime, Total = total, Goal = goal });
             }
 
             // Fill in the missing days with null total and default goal
-            List<DateTime> allDates = Enumerable.Range(0, (currentDate - oneYearAgo).Days)
+            const int ZERO_DATE_OFFSET = 0;
+            List<DateTime> allDates = Enumerable.Range(ZERO_DATE_OFFSET, (currentDate - oneYearAgo).Days)
                 .Select(offset => oneYearAgo.AddDays(offset).Date)
                 .ToList();
 
