@@ -15,7 +15,37 @@ namespace NoCO2.Test
     }
 
     [Fact]
-    public async Task UserNotFound()
+    public async Task EmptyBody()
+    {
+      var user = new {};
+      string body = JsonConvert.SerializeObject(user);
+
+      var request = TestFactory.CreateHttpRequest(body, "post");
+      var response = await _getEmissionHistory.GetEmissionHistoryWithUserKey(request);
+
+      Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+      Assert.Equal("{\"reply\":\"InvalidArgument\"}", await response.GetResponseBody());
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    public async Task EmptyBodyUserKey(string userKey)
+    {
+      var user = new {
+        UserKey = userKey
+      };
+      string body = JsonConvert.SerializeObject(user);
+
+      var request = TestFactory.CreateHttpRequest(body, "post");
+      var response = await _getEmissionHistory.GetEmissionHistoryWithUserKey(request);
+
+      Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+      Assert.Equal("{\"reply\":\"InvalidArgument\"}", await response.GetResponseBody());
+    }
+
+    [Fact]
+    public async Task UserKeyNotAuth()
     {
       var user = new {
         UserKey = "RandomRandomRandomRandomRandomRandom"
@@ -26,7 +56,7 @@ namespace NoCO2.Test
       var response = await _getEmissionHistory.GetEmissionHistoryWithUserKey(request);
 
       Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-      Assert.Equal("{\"reply\":\"UserNotFound\"}", await response.GetResponseBody());
+      Assert.Equal("{\"reply\":\"UserKeyNotAuth\"}", await response.GetResponseBody());
     }
 
     [Fact]
