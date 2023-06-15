@@ -5,19 +5,18 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using MySqlConnector;
 using Newtonsoft.Json;
-using BCrypt.Net;
 
 namespace Company.Function
 {
-    public class SubmitUserActivity
+    public class SubmitUserActivites
     {
 
-        public SubmitUserActivity()
+        public SubmitUserActivites()
         {
             FirebaseInitializer.Initialize();
         }
 
-        [Function("SubmitUserActivity")]
+        [Function("SubmitUserActivites")]
         public static async Task<IActionResult> SubmitInformationAsync([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "submit-user-activity")] HttpRequestData req)
         {
            try
