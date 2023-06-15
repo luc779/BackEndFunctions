@@ -59,14 +59,14 @@ namespace Company.Function;
             { "Linen", 5.4 }
         };
         // driving calcuation, returns a string of total emissions from varaibles
-        public string DrivingCalculation(string vechileType, string distance)
+        public double DrivingCalculation(string vechileType, string distance)
         {
             double vechileTypeEmission = vehicleType[vechileType];
             double gallons = int.Parse(distance) / vechileTypeEmission; // change vechile emissions to pounds
             double litersConversion = literInGallon * gallons;
             double kgOfCo2 = litersConversion * literToKgCo2;
-            // double roundUp5Decimals = Math.Ceiling(kgOfCo2 * 100000) / 100000;
-            return kgOfCo2.ToString();
+            // round up 5 decimals
+            return Math.Ceiling(kgOfCo2 * 100000) / 100000;
         }
         // food calculations, returns a string of total emissions from variables
         public string FoodCalculation(string foodName, string amount)

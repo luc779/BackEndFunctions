@@ -5,6 +5,7 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using MySqlConnector;
 using Newtonsoft.Json;
+using BCrypt.Net;
 
 namespace Company.Function
 {
@@ -37,8 +38,11 @@ namespace Company.Function
 
                 try
                 {
-                    // Hash the userKey
-                    string hashedUserKey = BCrypt.Net.BCrypt.HashPassword(userKey);
+                    // find userKey and return the ID
+                    int ID = FindUser(userKey);
+                    if (ID == -1) {
+                        return new BadRequestObjectResult("UserNotFound");
+                    }
 
                     // Check if the database has a user with the same hashedUserKey
                     bool isUserAdded = SubmitActivities(userKey, transports, foods, utilities);
@@ -62,8 +66,34 @@ namespace Company.Function
             throw new NotImplementedException();
         }
 
+        private static int FindUser(string userKey)
+        {
+            int ID = -1;
+            const string query = "SELECT * From Users";
+
+            // open connection
+            MySqlConnection connection = DatabaseConnecter.MySQLDatabase();
+            connection.Open();
+
+            // set command and reader at the Users Table
+            using MySqlCommand command = new(query, connection);
+            using MySqlDataReader reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                int currID = reader.GetInt32("@ID");
+                string currUserKey = reader.GetString("@UserKey");
+
+                bool found = BCrypt.Net.BCrypt.Verify(userKey, currUserKey);
+                if (found) {
+                    ID = currID;
+                    break;
+                }
+            }
+            return ID;
+        }
+
         public static bool SubmitActivities(string hashedUserKey, List<dynamic> transports, List<dynamic> foods, List<dynamic> utilities ) {
-            MySqlConnection connection = DatabaseConnecter.ConnectToMySql();
+            MySqlConnection connection = DatabaseConnecter.MySQLDatabase();
             using(connection)
             {
                 connection.Open();
@@ -97,26 +127,28 @@ namespace Company.Function
             return true;
         }
         public static void DeleteFromDatabase(MySqlCommand command, string hashedUserKey, string date) {
-            string query = "DELETE FROM Activities WHERE UserID = '" + hashedUserKey + "' AND DateTime = '" + date + "';";
+            string query = "DELETE FROM Activities WHERE UserID = '" + hashedUserKey + "' AND DateTime = '" + date + "'";
             command.CommandText = query;
             command.ExecuteNonQuery();
         }
 
         public static void InputTransport(List<dynamic> transports, MySqlCommand command, string hashedUserKey, string date) {
+            
+            // varaibles that dont change for each unique transport
+            string ID = hashedUserKey;
+            const string userID = "";
+            const string activityType = "transport";
+            Functions calculations = new Functions();
+
             foreach (var transport in transports)
             {
-                string transportType = transport.TransportType;
-                string miles = transport.Miles;
-
-                string userID = "";
-                const string activityType = "transport";
-                int method = 0;
-                double amount = 0.0;
-                double emission = 0.0;
+                string method = transport.TransportType;
+                string amount = transport.Miles;
+                double emission = calculations.DrivingCalculation(method, amount);
 
                 const string query = "INSERT INTO Activities (ID, UserID, ActivityType, Method, Amount, DateTime, Emission) Values (@ID, @UserID, @ActivityType, @Method, @Amount, @DateTime, @Emission)";
                 command.CommandText = query;
-                command.Parameters.AddWithValue("@ID", hashedUserKey);
+                command.Parameters.AddWithValue("@ID", ID);
                 command.Parameters.AddWithValue("@UserID", userID);
                 command.Parameters.AddWithValue("@ActivityType", activityType);
                 command.Parameters.AddWithValue("@Method", method);
