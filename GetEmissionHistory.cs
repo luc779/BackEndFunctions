@@ -110,11 +110,11 @@ namespace NoCO2.Function
         const string ONE_YEAR_AGO = "@oneYearAgo";
         const string CURRENT_DATE = "@currentDate";
 
-        string query = $"SELECT e.DateTime, e.TotalAmount, e.Goal " +
-                      $"FROM DailyEmission AS e " +
-                      $"JOIN Users AS u ON e.UserId = u.UserId " +
-                      $"WHERE u.UserId = {USERID} AND e.DateTime >= {ONE_YEAR_AGO} AND e.DateTime <= {CURRENT_DATE} " +
-                      $"ORDER BY e.DateTime ASC";
+        string query = "SELECT e.DateTime, e.TotalAmount, e.Goal " +
+                       "FROM DailyEmission AS e " +
+                       "JOIN Users AS u ON e.UserID = u.ID " +
+                       "WHERE u.ID = " + USERID + " AND e.DateTime >= " + ONE_YEAR_AGO + " AND e.DateTime <= " + CURRENT_DATE +
+                       " ORDER BY e.DateTime ASC";
 
 
         using (MySqlCommand command = connection.CreateCommand())
