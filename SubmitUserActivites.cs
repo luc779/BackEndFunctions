@@ -43,8 +43,8 @@ namespace Company.Function
                     }
 
                     // Check if the database has a user with the same userKey
-                    bool isUserAdded = SubmitActivities(ID, transports, foods, utilities);
-                    if (isUserAdded) {
+                    bool isActivitiesAdded = SubmitActivities(ID, transports, foods, utilities);
+                    if (isActivitiesAdded) {
                         return new OkObjectResult("Success");
                     } else {
                         return new BadRequestObjectResult("InvalidInput");
@@ -87,7 +87,7 @@ namespace Company.Function
             }
             return ID;
         }
-        public static bool SubmitActivities(int ID, List<dynamic> transports, List<dynamic> foods, List<dynamic> utilities) {
+        public static bool SubmitActivities(int userID, List<dynamic> transports, List<dynamic> foods, List<dynamic> utilities) {
             MySqlConnection connection = DatabaseConnecter.MySQLDatabase();
             using(connection)
             {
@@ -99,7 +99,7 @@ namespace Company.Function
                     string date = todaysDate.ToString("yyyy/MM/dd");
 
                     // delete previous entries
-                    DeleteFromDatabase(connection, ID, date);
+                    DeleteFromDatabase(connection, userID, date);
 
                     // check if the new parameters are valid numbers
                     bool validatedNumbers = ValidateNumbers(transports, foods, utilities);
@@ -109,12 +109,12 @@ namespace Company.Function
 
                     // input new entries using same query
                     const string QUERY = "INSERT INTO Activities (UserID, ActivityType, Method, Amount, DateTime, Emission) Values (@UserID, @ActivityType, @Method, @Amount, @DateTime, @Emission)";
-                    InputTransport(ID, transports, connection, date, QUERY);
-                    InputFood(ID, foods, connection, date, QUERY);
-                    InputUtilities(ID, utilities, connection, date, QUERY);
+                    InputTransport(userID, transports, connection, date, QUERY);
+                    InputFood(userID, foods, connection, date, QUERY);
+                    InputUtilities(userID, utilities, connection, date, QUERY);
 
                     // update Daily emissions
-                    UpdateDailyEmissions(ID, connection, date);
+                    UpdateDailyEmissions(userID, connection, date);
 
                     // commit and close
                     transaction.Commit();
@@ -178,18 +178,17 @@ namespace Company.Function
             }
             return true; // All amounts are valid numbers
         }
-        public static void DeleteFromDatabase(MySqlConnection connection, int ID, string date) {
+        public static void DeleteFromDatabase(MySqlConnection connection, int userID, string date) {
             // new command
-            string query = "DELETE FROM Activities WHERE UserID = '" + ID + "' AND DateTime = '" + date + "'";
+            string query = "DELETE FROM Activities WHERE UserID = '" + userID + "' AND DateTime = '" + date + "'";
             using MySqlCommand command = new(query, connection);
             command.CommandText = query;
             command.ExecuteNonQuery();
         }
-        public static void InputTransport(int ID, List<dynamic> transports, MySqlConnection connection, string date, string QUERY) {
+        public static void InputTransport(int userID, List<dynamic> transports, MySqlConnection connection, string date, string QUERY) {
             // new command
             using MySqlCommand command = new(QUERY, connection);
             // varaibles that dont change for each unique transport
-            int userID = ID;
             const string ACTIVITY_TYPE = "transport";
             Functions calculations = new();
 
@@ -215,11 +214,10 @@ namespace Company.Function
                 command.ExecuteNonQuery();
             }
         }
-        public  static void InputFood(int ID, List<dynamic> foods, MySqlConnection connection, string date, string QUERY) {
+        public  static void InputFood(int userID, List<dynamic> foods, MySqlConnection connection, string date, string QUERY) {
             // new command
             using MySqlCommand command = new(QUERY, connection);
             // varaibles that dont change for each unique foods
-            int userID = ID;
             const string ACTIVITY_TYPE = "foods";
             Functions calculations = new();
 
@@ -245,11 +243,10 @@ namespace Company.Function
                 command.ExecuteNonQuery();
             }
         }
-        public static void InputUtilities(int ID, List<dynamic> utilities, MySqlConnection connection, string date, string QUERY) {
+        public static void InputUtilities(int userID, List<dynamic> utilities, MySqlConnection connection, string date, string QUERY) {
             // new command
             using MySqlCommand command = new(QUERY, connection);
             // varaibles that dont change for each unique foods
-            int userID = ID;
             const string ACTIVITY_TYPE = "utility";
             Functions calculations = new();
 
@@ -268,7 +265,6 @@ namespace Company.Function
 
                 // insert info in Activities Table
                 command.CommandText = QUERY;
-                command.Parameters.AddWithValue("@ID", ID);
                 command.Parameters.AddWithValue("@UserID", userID);
                 command.Parameters.AddWithValue("@ActivityType", ACTIVITY_TYPE);
                 command.Parameters.AddWithValue("@Method", method);
@@ -278,16 +274,16 @@ namespace Company.Function
                 command.ExecuteNonQuery();
             }
         }
-        private static void UpdateDailyEmissions(int ID, MySqlConnection connection, string date)
+        private static void UpdateDailyEmissions(int userID, MySqlConnection connection, string date)
         {
             // get the total Emissions from the day
-            double addedTotalEmissions = GetTotalEmissions(ID, connection, date);
-            UpdateOrSetDailyEmissions(ID, connection, date, addedTotalEmissions);
+            double addedTotalEmissions = GetTotalEmissions(userID, connection, date);
+            UpdateOrSetDailyEmissions(userID, connection, date, addedTotalEmissions);
         }
-        private static double GetTotalEmissions(int ID, MySqlConnection connection, string date)
+        private static double GetTotalEmissions(int userID, MySqlConnection connection, string date)
         {
             // new command
-            string query = "SELECT Emission FROM Activities WHERE UserID = '" + ID + "' AND DateTime = '" + date + "'";
+            string query = "SELECT Emission FROM Activities WHERE UserID = '" + userID + "' AND DateTime = '" + date + "'";
             using MySqlCommand command = new(query, connection);
 
             double totalAddedEmissions = 0;
@@ -301,10 +297,10 @@ namespace Company.Function
             }
             return totalAddedEmissions;
         }
-         private static void UpdateOrSetDailyEmissions(int ID, MySqlConnection connection, string date, double addedTotalEmissions)
+         private static void UpdateOrSetDailyEmissions(int userID, MySqlConnection connection, string date, double addedTotalEmissions)
         {
             // read table DailyEmissions
-            string query = "SELECT * FROM DailyEmissions WHERE UserID = '" + ID + "' AND DateTime = '" + date + "' FOR UPDATE";
+            string query = "SELECT * FROM DailyEmissions WHERE UserID = '" + userID + "' AND DateTime = '" + date + "' FOR UPDATE";
             using MySqlCommand command = new(query, connection);
             using MySqlDataReader reader = command.ExecuteReader();
             if (reader.Read())
@@ -314,13 +310,13 @@ namespace Company.Function
                 double newTotalAmount = currentTotalAmount + addedTotalEmissions;
 
                 // Update the TotalAmount for the existing entry
-                string updateQuery = "UPDATE DailyEmissions SET TotalAmount = @TotalAmount WHERE UserID = '" + ID + "' AND DateTime = '" + date + "'";
+                string updateQuery = "UPDATE DailyEmissions SET TotalAmount = @TotalAmount WHERE UserID = '" + userID + "' AND DateTime = '" + date + "'";
 
                 // command to update table DailyEmissions
                 using MySqlCommand updateCommand = new(updateQuery, connection);
                 updateCommand.Parameters.AddWithValue("@TotalAmount", newTotalAmount);
                 updateCommand.Parameters.AddWithValue("@Date", date);
-                updateCommand.Parameters.AddWithValue("@ID", ID);
+                updateCommand.Parameters.AddWithValue("@UserID", userID);
                 updateCommand.ExecuteNonQuery();
             }
             else
@@ -330,7 +326,7 @@ namespace Company.Function
 
                 // command to insert new row to DailyEmissions
                 using MySqlCommand insertCommand = new(INSERT_QUERY, connection);
-                insertCommand.Parameters.AddWithValue("@UserID", ID);
+                insertCommand.Parameters.AddWithValue("@UserID", userID);
                 insertCommand.Parameters.AddWithValue("@TotalAmount", addedTotalEmissions);
                 const double GOAL = 60.4;
                 insertCommand.Parameters.AddWithValue("@Goal", GOAL);
