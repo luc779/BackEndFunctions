@@ -47,9 +47,11 @@ namespace Company.Function;
             { "Banana",                   new FoodEmission(110, true) },   // 1 banana
             { "Tofu",                     new FoodEmission(80, false) },
             { "Apple",                    new FoodEmission(60, true) },    // 1 apple
-            { "Brassica, nuts, potatoes", new FoodEmission(50, false) },
+            { "Brassica",                 new FoodEmission(50, false) },
+            { "Nuts",                     new FoodEmission(50, false) },
+            { "Potatoes",                 new FoodEmission(50, false) },
             { "Orange",                   new FoodEmission(50, true) },    // 1 orange
-            { "Root vegetables",          new FoodEmission(40, false) },
+            { "Root Vegetables",          new FoodEmission(40, false) },
             { "Milk",                     new FoodEmission(800, true) },   // 1 glass
             { "Soy Milk",                 new FoodEmission(250, true) },   // 1 glass
             { "Almond Milk",              new FoodEmission(180, true) }    // 1 glass
