@@ -8,9 +8,9 @@ using Newtonsoft.Json;
 
 namespace Company.Function
 {
-    public class SubmitUserActivites
+    public static class SubmitUserActivites
     {
-        public SubmitUserActivites()
+        static SubmitUserActivites()
         {
             FirebaseInitializer.Initialize();
         }
@@ -304,7 +304,7 @@ namespace Company.Function
          private static void UpdateOrSetDailyEmissions(int ID, MySqlConnection connection, string date, double addedTotalEmissions)
         {
             // read table DailyEmissions
-            string query = "SELECT * FROM DailyEmissions WHERE UserID = '" + ID + "' AND DateTime = '" + date + "'";
+            string query = "SELECT * FROM DailyEmissions WHERE UserID = '" + ID + "' AND DateTime = '" + date + "' FOR UPDATE";
             using MySqlCommand command = new(query, connection);
             using MySqlDataReader reader = command.ExecuteReader();
             if (reader.Read())
