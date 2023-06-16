@@ -65,14 +65,14 @@ namespace Company.Function
         private static int FindUser(string userKey)
         {
             int ID = -1;
-            const string query = "SELECT * From Users";
+            const string QUERY = "SELECT * From Users";
 
             // open connection
             MySqlConnection connection = DatabaseConnecter.MySQLDatabase();
             connection.Open();
 
             // set command and reader at the Users Table
-            using MySqlCommand command = new(query, connection);
+            using MySqlCommand command = new(QUERY, connection);
             using MySqlDataReader reader = command.ExecuteReader();
             while (reader.Read())
             {
@@ -108,10 +108,10 @@ namespace Company.Function
                     }
 
                     // input new entries using same query
-                    const string query = "INSERT INTO Activities (UserID, ActivityType, Method, Amount, DateTime, Emission) Values (@UserID, @ActivityType, @Method, @Amount, @DateTime, @Emission)";
-                    InputTransport(ID, transports, connection, date, query);
-                    InputFood(ID, foods, connection, date, query);
-                    InputUtilities(ID, utilities, connection, date, query);
+                    const string QUERY = "INSERT INTO Activities (UserID, ActivityType, Method, Amount, DateTime, Emission) Values (@UserID, @ActivityType, @Method, @Amount, @DateTime, @Emission)";
+                    InputTransport(ID, transports, connection, date, QUERY);
+                    InputFood(ID, foods, connection, date, QUERY);
+                    InputUtilities(ID, utilities, connection, date, QUERY);
 
                     // update Daily emissions
                     UpdateDailyEmissions(ID, connection, date);
@@ -185,12 +185,12 @@ namespace Company.Function
             command.CommandText = query;
             command.ExecuteNonQuery();
         }
-        public static void InputTransport(int ID, List<dynamic> transports, MySqlConnection connection, string date, string query) {
+        public static void InputTransport(int ID, List<dynamic> transports, MySqlConnection connection, string date, string QUERY) {
             // new command
-            using MySqlCommand command = new(query, connection);
+            using MySqlCommand command = new(QUERY, connection);
             // varaibles that dont change for each unique transport
             int userID = ID;
-            const string activityType = "transport";
+            const string ACTIVITY_TYPE = "transport";
             Functions calculations = new();
 
             // add each entry in the table
@@ -205,9 +205,9 @@ namespace Company.Function
                 double emission = calculations.DrivingCalculation(method, amount);
 
                 // insert info in Activities Table
-                command.CommandText = query;
+                command.CommandText = QUERY;
                 command.Parameters.AddWithValue("@UserID", userID);
-                command.Parameters.AddWithValue("@ActivityType", activityType);
+                command.Parameters.AddWithValue("@ActivityType", ACTIVITY_TYPE);
                 command.Parameters.AddWithValue("@Method", method);
                 command.Parameters.AddWithValue("@Amount", amount);
                 command.Parameters.AddWithValue("@DateTime", date);
@@ -215,12 +215,12 @@ namespace Company.Function
                 command.ExecuteNonQuery();
             }
         }
-        public  static void InputFood(int ID, List<dynamic> foods, MySqlConnection connection, string date, string query) {
+        public  static void InputFood(int ID, List<dynamic> foods, MySqlConnection connection, string date, string QUERY) {
             // new command
-            using MySqlCommand command = new(query, connection);
+            using MySqlCommand command = new(QUERY, connection);
             // varaibles that dont change for each unique foods
             int userID = ID;
-            const string activityType = "foods";
+            const string ACTIVITY_TYPE = "foods";
             Functions calculations = new();
 
             // add each food in foods
@@ -235,9 +235,9 @@ namespace Company.Function
                 double emission = calculations.FoodCalculation(method, amount);
 
                 // insert info in Activities Table
-                command.CommandText = query;
+                command.CommandText = QUERY;
                 command.Parameters.AddWithValue("@UserID", userID);
-                command.Parameters.AddWithValue("@ActivityType", activityType);
+                command.Parameters.AddWithValue("@ActivityType", ACTIVITY_TYPE);
                 command.Parameters.AddWithValue("@Method", method);
                 command.Parameters.AddWithValue("@Amount", amount);
                 command.Parameters.AddWithValue("@DateTime", date);
@@ -245,12 +245,12 @@ namespace Company.Function
                 command.ExecuteNonQuery();
             }
         }
-        public static void InputUtilities(int ID, List<dynamic> utilities, MySqlConnection connection, string date, string query) {
+        public static void InputUtilities(int ID, List<dynamic> utilities, MySqlConnection connection, string date, string QUERY) {
             // new command
-            using MySqlCommand command = new(query, connection);
+            using MySqlCommand command = new(QUERY, connection);
             // varaibles that dont change for each unique foods
             int userID = ID;
-            const string activityType = "utility";
+            const string ACTIVITY_TYPE = "utility";
             Functions calculations = new();
 
             foreach (var utility in utilities)
@@ -267,10 +267,10 @@ namespace Company.Function
                 }
 
                 // insert info in Activities Table
-                command.CommandText = query;
+                command.CommandText = QUERY;
                 command.Parameters.AddWithValue("@ID", ID);
                 command.Parameters.AddWithValue("@UserID", userID);
-                command.Parameters.AddWithValue("@ActivityType", activityType);
+                command.Parameters.AddWithValue("@ActivityType", ACTIVITY_TYPE);
                 command.Parameters.AddWithValue("@Method", method);
                 command.Parameters.AddWithValue("@Amount", amount);
                 command.Parameters.AddWithValue("@DateTime", date);
@@ -326,14 +326,14 @@ namespace Company.Function
             else
             {
                 // Entry does not exist, insert a new row
-                const string insertQuery = "INSERT INTO DailyEmissions (UserID, TotalAmount, Goal, DateTime) VALUES (@UserID, @TotalAmount, @Goal, @DateTime)";
+                const string INSERT_QUERY = "INSERT INTO DailyEmissions (UserID, TotalAmount, Goal, DateTime) VALUES (@UserID, @TotalAmount, @Goal, @DateTime)";
 
                 // command to insert new row to DailyEmissions
-                using MySqlCommand insertCommand = new(insertQuery, connection);
+                using MySqlCommand insertCommand = new(INSERT_QUERY, connection);
                 insertCommand.Parameters.AddWithValue("@UserID", ID);
                 insertCommand.Parameters.AddWithValue("@TotalAmount", addedTotalEmissions);
-                const double goal = 60.4;
-                insertCommand.Parameters.AddWithValue("@Goal", goal);
+                const double GOAL = 60.4;
+                insertCommand.Parameters.AddWithValue("@Goal", GOAL);
                 insertCommand.Parameters.AddWithValue("@Date", date);
                 insertCommand.ExecuteNonQuery();
             }
