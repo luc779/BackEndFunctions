@@ -107,7 +107,7 @@ namespace Company
                     InputUtilities(userID, utilities, connection, date, QUERY);
 
                     // update Daily emissions
-                    UpdateDailyEmissions(userID, connection, date);
+                    DailyEmissionsHelper(userID, connection, date);
 
                     // commit and close
                     transaction.Commit();
@@ -261,7 +261,7 @@ namespace Company
                 throw new Exception(); // makes SubmitActivities rollback
             }
         }
-        private static void UpdateDailyEmissions(int userID, MySqlConnection connection, string date)
+        private static void DailyEmissionsHelper(int userID, MySqlConnection connection, string date)
         {
             // get the total Emissions from the day
             double addedTotalEmissions = GetTotalEmissions(userID, connection, date);
@@ -293,7 +293,7 @@ namespace Company
                 throw new Exception();
             }
         }
-         private static void UpdateOrSetDailyEmissions(int userID, MySqlConnection connection, string date, double addedTotalEmissions)
+        private static void UpdateOrSetDailyEmissions(int userID, MySqlConnection connection, string date, double addedTotalEmissions)
         {
             // read table DailyEmissions
             string query = "SELECT * FROM DailyEmissions WHERE UserID = '" + userID + "' AND DateTime = '" + date + "' FOR UPDATE";
