@@ -84,13 +84,16 @@ namespace NoCO2.Function
               {
                 string hashedUserKeyInDB = reader.GetString(1);
                 if (BCrypt.Net.BCrypt.Verify(userKey, hashedUserKeyInDB)) {
+                  connection.Close();
                   return reader.GetInt32("ID");
                 }
               }
             }
           }
+          connection.Close();
           return -1;
         } catch (Exception) {
+          connection.Close();
           return -1;
         }
       }
@@ -156,10 +159,11 @@ namespace NoCO2.Function
                 Total = null,
                 Goal = EMISSION_GOAL
               }));
-
+              connection.Close();
               return emissions.OrderBy(e => e.DateTime).ToList();
             }
             // Return empty history if there are none within an year
+            connection.Close();
             return emissions;
           }
         }
