@@ -268,7 +268,7 @@ namespace Company
         private static void DailyEmissionsHelper(int userID, MySqlConnection connection, DateTime todaysDate)
         {
             // get the total Emissions from the day
-            double addedTotalEmissions = GetTotalEmissions(userID, connection, date);
+            double addedTotalEmissions = GetTotalEmissions(userID, connection, todaysDate);
             UpdateOrSetDailyEmissions(userID, connection, todaysDate, addedTotalEmissions);
         }
         private static double GetTotalEmissions(int userID, MySqlConnection connection, DateTime todaysDate)
