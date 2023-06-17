@@ -99,8 +99,7 @@ namespace Company
                 using MySqlTransaction transaction = connection.BeginTransaction();
                 try
                 {
-                    DateTime todaysDate = DateTime.UtcNow;
-                    string date = todaysDate.ToString("yyyy/MM/dd");
+                    DateTime date = DateTime.UtcNow.Date;
 
                     // delete previous entries
                     DeleteFromDatabase(connection, userID, date);
@@ -127,9 +126,9 @@ namespace Company
             }
             return true;
         }
-        private static void DeleteFromDatabase(MySqlConnection connection, int userID, string date) {
+        private static void DeleteFromDatabase(MySqlConnection connection, int userID, DateTime todaysDate) {
             // new command
-            string query = "DELETE FROM Activities WHERE UserID = '" + userID + "' AND DateTime = '" + date + "'";
+            string query = "DELETE FROM Activities WHERE UserID = '" + userID + "' AND DateTime = '" + todaysDate + "'";
             using MySqlCommand command = new(query, connection);
             // start transaction
             command.Transaction = connection.BeginTransaction();
@@ -144,7 +143,7 @@ namespace Company
                 throw new Exception();
             }
         }
-        private static void InputTransport(int userID, List<dynamic> transports, MySqlConnection connection, string date, string QUERY) {
+        private static void InputTransport(int userID, List<dynamic> transports, MySqlConnection connection, DateTime todaysDate, string QUERY) {
             // new command
             using MySqlCommand command = new(QUERY, connection);
             // start a transaction
@@ -173,7 +172,7 @@ namespace Company
                 command.Parameters.AddWithValue("@ActivityType", ACTIVITY_TYPE);
                 command.Parameters.AddWithValue("@Method", method);
                 command.Parameters.AddWithValue("@Amount", amount);
-                command.Parameters.AddWithValue("@DateTime", date);
+                command.Parameters.AddWithValue("@DateTime", todaysDate);
                 command.Parameters.AddWithValue("@Emission", emission);
                 command.ExecuteNonQuery();
             }
@@ -185,7 +184,7 @@ namespace Company
                 throw new Exception(); // makes SubmitActivities rollback
             }
         }
-        private  static void InputFood(int userID, List<dynamic> foods, MySqlConnection connection, string date, string QUERY) {
+        private  static void InputFood(int userID, List<dynamic> foods, MySqlConnection connection, DateTime todaysDate, string QUERY) {
             // new command
             using MySqlCommand command = new(QUERY, connection);
             // start transaction
@@ -213,7 +212,7 @@ namespace Company
                 command.Parameters.AddWithValue("@ActivityType", ACTIVITY_TYPE);
                 command.Parameters.AddWithValue("@Method", method);
                 command.Parameters.AddWithValue("@Amount", amount);
-                command.Parameters.AddWithValue("@DateTime", date);
+                command.Parameters.AddWithValue("@DateTime", todaysDate);
                 command.Parameters.AddWithValue("@Emission", emission);
                 command.ExecuteNonQuery();
             }
@@ -225,7 +224,7 @@ namespace Company
                 throw new Exception(); // makes SubmitActivities rollback
             }
         }
-        private static void InputUtilities(int userID, List<dynamic> utilities, MySqlConnection connection, string date, string QUERY) {
+        private static void InputUtilities(int userID, List<dynamic> utilities, MySqlConnection connection, DateTime todaysDate, string QUERY) {
             // new command
             using MySqlCommand command = new(QUERY, connection);
             // start a transaction
@@ -254,7 +253,7 @@ namespace Company
                     command.Parameters.AddWithValue("@ActivityType", ACTIVITY_TYPE);
                     command.Parameters.AddWithValue("@Method", method);
                     command.Parameters.AddWithValue("@Amount", amount);
-                    command.Parameters.AddWithValue("@DateTime", date);
+                    command.Parameters.AddWithValue("@DateTime", todaysDate);
                     command.Parameters.AddWithValue("@Emission", emission);
                     command.ExecuteNonQuery();
                 }
@@ -266,16 +265,16 @@ namespace Company
                 throw new Exception(); // makes SubmitActivities rollback
             }
         }
-        private static void DailyEmissionsHelper(int userID, MySqlConnection connection, string date)
+        private static void DailyEmissionsHelper(int userID, MySqlConnection connection, DateTime todaysDate)
         {
             // get the total Emissions from the day
             double addedTotalEmissions = GetTotalEmissions(userID, connection, date);
-            UpdateOrSetDailyEmissions(userID, connection, date, addedTotalEmissions);
+            UpdateOrSetDailyEmissions(userID, connection, todaysDate, addedTotalEmissions);
         }
-        private static double GetTotalEmissions(int userID, MySqlConnection connection, string date)
+        private static double GetTotalEmissions(int userID, MySqlConnection connection, DateTime todaysDate)
         {
             // new command
-            string query = "SELECT Emission FROM Activities WHERE UserID = '" + userID + "' AND DateTime = '" + date + "'";
+            string query = "SELECT Emission FROM Activities WHERE UserID = '" + userID + "' AND DateTime = '" + todaysDate + "'";
             using MySqlCommand command = new(query, connection);
             // start a transaction
             command.Transaction = connection.BeginTransaction();
@@ -298,10 +297,10 @@ namespace Company
                 throw new Exception();
             }
         }
-        private static void UpdateOrSetDailyEmissions(int userID, MySqlConnection connection, string date, double addedTotalEmissions)
+        private static void UpdateOrSetDailyEmissions(int userID, MySqlConnection connection, DateTime todaysDate, double addedTotalEmissions)
         {
             // read table DailyEmissions
-            string query = "SELECT * FROM DailyEmissions WHERE UserID = '" + userID + "' AND DateTime = '" + date + "' FOR UPDATE";
+            string query = "SELECT * FROM DailyEmissions WHERE UserID = '" + userID + "' AND DateTime = '" + todaysDate + "' FOR UPDATE";
             using MySqlCommand command = new(query, connection);
             // start a transaciton 
             command.Transaction = connection.BeginTransaction();
@@ -315,7 +314,7 @@ namespace Company
                     double newTotalAmount = currentTotalAmount + addedTotalEmissions;
 
                     // Update the TotalAmount for the existing entry
-                    string updateQuery = "UPDATE DailyEmissions SET TotalAmount = @TotalAmount WHERE UserID = '" + userID + "' AND DateTime = '" + date + "'";
+                    string updateQuery = "UPDATE DailyEmissions SET TotalAmount = @TotalAmount WHERE UserID = '" + userID + "' AND DateTime = '" + todaysDate + "'";
 
                     // command to update table DailyEmissions
                     using MySqlCommand updateCommand = new(updateQuery, connection);
@@ -325,7 +324,7 @@ namespace Company
                     try
                     {
                         updateCommand.Parameters.AddWithValue("@TotalAmount", newTotalAmount);
-                        updateCommand.Parameters.AddWithValue("@Date", date);
+                        updateCommand.Parameters.AddWithValue("@Date", todaysDate);
                         updateCommand.Parameters.AddWithValue("@UserID", userID);
                         updateCommand.ExecuteNonQuery();
                         updateCommand.Transaction.Commit();
@@ -351,7 +350,7 @@ namespace Company
                         insertCommand.Parameters.AddWithValue("@TotalAmount", addedTotalEmissions);
                         const double GOAL = 60.4;
                         insertCommand.Parameters.AddWithValue("@Goal", GOAL);
-                        insertCommand.Parameters.AddWithValue("@Date", date);
+                        insertCommand.Parameters.AddWithValue("@Date", todaysDate);
                         insertCommand.ExecuteNonQuery();
                         insertCommand.Transaction.Commit();
                     }
