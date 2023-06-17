@@ -106,23 +106,20 @@ namespace NoCO2.Function
       using (connection)
       {
         connection.Open();
-        const string USERID = "@userId";
-        const string ONE_YEAR_AGO = "@oneYearAgo";
-        const string CURRENT_DATE = "@currentDate";
 
         string query = "SELECT e.DateTime, e.TotalAmount, e.Goal " +
-                       "FROM DailyEmission AS e " +
-                       "JOIN Users AS u ON e.UserID = u.ID " +
-                       "WHERE u.ID = " + USERID + " AND e.DateTime >= " + ONE_YEAR_AGO + " AND e.DateTime <= " + CURRENT_DATE +
-                       " ORDER BY e.DateTime ASC";
+               "FROM DailyEmission AS e " +
+               "JOIN Users AS u ON e.UserID = u.ID " +
+               "WHERE u.ID = @userId AND e.DateTime >= '@oneYearAgo' AND e.DateTime <= '@currentDate'" +
+               " ORDER BY e.DateTime ASC";
 
 
         using (MySqlCommand command = connection.CreateCommand())
         {
           command.CommandText = query;
-          command.Parameters.AddWithValue(USERID, userId);
-          command.Parameters.AddWithValue(ONE_YEAR_AGO, oneYearAgo);
-          command.Parameters.AddWithValue(CURRENT_DATE, currentDate);
+          command.Parameters.AddWithValue("@userId", userId);
+          command.Parameters.AddWithValue("@oneYearAgo", oneYearAgo.ToString("yyyy/MM/dd"));
+          command.Parameters.AddWithValue("@currentDate", currentDate.ToString("yyyy/MM/dd"));
 
           using (MySqlDataReader reader = await command.ExecuteReaderAsync())
           {
