@@ -268,8 +268,8 @@ namespace Company
         private static void DailyEmissionsHelper(int userID, MySqlConnection connection, DateTime todaysDate)
         {
             // get the total Emissions from the day
-            double addedTotalEmissions = GetTotalEmissions(userID, connection, todaysDate);
-            UpdateOrSetDailyEmissions(userID, connection, todaysDate, addedTotalEmissions);
+            double totalEmissions = GetTotalEmissions(userID, connection, todaysDate);
+            UpdateOrSetDailyEmissions(userID, connection, todaysDate, totalEmissions);
         }
         private static double GetTotalEmissions(int userID, MySqlConnection connection, DateTime todaysDate)
         {
@@ -280,24 +280,24 @@ namespace Company
             command.Transaction = connection.BeginTransaction();
 
             try {
-                double totalAddedEmissions = 0;
+                double totalEmissions = 0;
                 // set command and reader at the Users Table
                 command.CommandText = query;
                 using MySqlDataReader reader = command.ExecuteReader();
                 while (reader.Read())
                 {
                     double currEmission = reader.GetDouble("Emission");
-                    totalAddedEmissions += currEmission;
+                    totalEmissions += currEmission;
                 }
                 command.Transaction.Commit();
-                return totalAddedEmissions;
+                return totalEmissions;
             }
             catch (Exception) {
                 command.Transaction.Rollback();
                 throw new Exception();
             }
         }
-        private static void UpdateOrSetDailyEmissions(int userID, MySqlConnection connection, DateTime todaysDate, double addedTotalEmissions)
+        private static void UpdateOrSetDailyEmissions(int userID, MySqlConnection connection, DateTime todaysDate, double totalEmissions)
         {
             // read table DailyEmissions
             string query = "SELECT * FROM DailyEmissions WHERE UserID = '" + userID + "' AND DateTime = '" + todaysDate + "' FOR UPDATE";
@@ -309,10 +309,6 @@ namespace Company
                 using MySqlDataReader reader = command.ExecuteReader();
                 if (reader.Read())
                 {
-                    // Entry exists, update TotalAmount
-                    double currentTotalAmount = reader.GetDouble("TotalAmount");
-                    double newTotalAmount = currentTotalAmount + addedTotalEmissions;
-
                     // Update the TotalAmount for the existing entry
                     string updateQuery = "UPDATE DailyEmissions SET TotalAmount = @TotalAmount WHERE UserID = '" + userID + "' AND DateTime = '" + todaysDate + "'";
 
@@ -323,7 +319,7 @@ namespace Company
 
                     try
                     {
-                        updateCommand.Parameters.AddWithValue("@TotalAmount", newTotalAmount);
+                        updateCommand.Parameters.AddWithValue("@TotalAmount", totalEmissions);
                         updateCommand.Parameters.AddWithValue("@Date", todaysDate);
                         updateCommand.Parameters.AddWithValue("@UserID", userID);
                         updateCommand.ExecuteNonQuery();
@@ -347,7 +343,7 @@ namespace Company
                     try
                     {
                         insertCommand.Parameters.AddWithValue("@UserID", userID);
-                        insertCommand.Parameters.AddWithValue("@TotalAmount", addedTotalEmissions);
+                        insertCommand.Parameters.AddWithValue("@TotalAmount", totalEmissions);
                         const double GOAL = 60.4;
                         insertCommand.Parameters.AddWithValue("@Goal", GOAL);
                         insertCommand.Parameters.AddWithValue("@Date", todaysDate);
