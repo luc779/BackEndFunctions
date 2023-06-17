@@ -17,10 +17,13 @@ namespace Company
         }
 
         [Function("SubmitUserActivites")]
-        public static async Task<IActionResult> SubmitInformationAsync([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "submit-user-activity")] HttpRequestData req)
+        public static async Task<HttpResponseData> SubmitInformationAsync([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "submit-user-activity")] HttpRequestData req)
         {
-           try
-           {
+            var responseBodyObject = new {
+                reply = "InternalError"
+            };
+            try
+            {
                 string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
                 dynamic data = JsonConvert.DeserializeObject(requestBody);
 
@@ -46,20 +49,29 @@ namespace Company
                     // Check if the database has a user with the same userKey
                     bool isActivitiesAdded = SubmitActivities(ID, transports, foods, utilities);
                     if (isActivitiesAdded) {
-                        return new OkObjectResult("Success");
+                        responseBodyObject = new {
+                            reply = "Success"
+                        };
+                        return await HttpResponseDataFactory.GetHttpResponseData(req, HttpStatusCode.OK, responseBodyObject);
                     } else {
-                        return new BadRequestObjectResult("InvalidInput");
+                        return await HttpResponseDataFactory.GetHttpResponseData(req, HttpStatusCode.InternalServerError, responseBodyObject);
                     }
                 }
                 catch (Exception) {
-                    return new BadRequestObjectResult("InternalError");
+                    return await HttpResponseDataFactory.GetHttpResponseData(req, HttpStatusCode.InternalServerError, responseBodyObject);
                 }
-           }
-           catch (ArgumentException) {
-                return new BadRequestObjectResult("InvalidArgument");
+            }
+            catch (ArgumentException) {
+                responseBodyObject = new {
+                    reply = "InvalidArgument"
+                };
+                return await HttpResponseDataFactory.GetHttpResponseData(req, HttpStatusCode.BadRequest, responseBodyObject);
             }
             catch (FirebaseAuthException) {
-                return new BadRequestObjectResult("UserKeyNotAuth");
+                responseBodyObject = new {
+                    reply = "UserKeyNotAuth"
+                };
+                return await HttpResponseDataFactory.GetHttpResponseData(req, HttpStatusCode.BadRequest, responseBodyObject);
             }
             throw new NotImplementedException();
         }
