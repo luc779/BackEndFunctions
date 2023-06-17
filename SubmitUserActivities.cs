@@ -2,7 +2,6 @@ using System.Net;
 using BackEndFucntions;
 using Company.Function;
 using FirebaseAdmin.Auth;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using MySqlConnector;
@@ -81,6 +80,13 @@ namespace Company
             throw new NotImplementedException();
         }
         public static bool SubmitActivities(int userID, List<dynamic> transports, List<dynamic> foods, List<dynamic> utilities) {
+            // check if the new parameters are valid numbers
+            bool validatedNumbers = ValidateActivitiesInput.ValidateNumbers(transports, foods, utilities);
+            if (!validatedNumbers) {
+                throw new Exception();
+            }
+
+            // create connection
             MySqlConnection connection = DatabaseConnecter.MySQLDatabase();
             using(connection)
             {
@@ -93,12 +99,6 @@ namespace Company
 
                     // delete previous entries
                     DeleteFromDatabase(connection, userID, date);
-
-                    // check if the new parameters are valid numbers
-                    bool validatedNumbers = ValidateNumbers(transports, foods, utilities);
-                    if (!validatedNumbers) {
-                        throw new Exception();
-                    }
 
                     // input new entries using same query
                     const string QUERY = "INSERT INTO Activities (UserID, ActivityType, Method, Amount, DateTime, Emission) Values (@UserID, @ActivityType, @Method, @Amount, @DateTime, @Emission)";
@@ -121,55 +121,6 @@ namespace Company
                 }
             }
             return true;
-        }
-        private static bool ValidateNumbers(List<dynamic> transports, List<dynamic> foods, List<dynamic> utilities)
-        {
-            // call each individual amount validator
-            bool transportsValid = ValidateTransportAmounts(transports);
-            bool foodsValid = ValidateFoodAmounts(foods);
-            bool utilitiesValid = ValidateUtilityAmounts(utilities);
-
-            // check if any are false, return false, otherwise true
-            return transportsValid && foodsValid && utilitiesValid;
-        }
-        private static bool ValidateTransportAmounts(List<dynamic> transports)
-        {
-            // go through each amount in transports and check if its a number variable
-            foreach (var transport in transports)
-            {
-                string amount = transport.Miles;
-                if (!double.TryParse(amount, out _))
-                {
-                    return false; // Invalid non-number value found, return false
-                }
-            }
-            return true; // All amounts are valid numbers
-        }
-        private static bool ValidateFoodAmounts(List<dynamic> foods)
-        {
-            // go through each amount in foods and check if its a number variable
-            foreach (var food in foods)
-            {
-                string amount = food.Amount;
-                if (!double.TryParse(amount, out _))
-                {
-                    return false; // Invalid non-number value found, return false
-                }
-            }
-            return true; // All amounts are valid numbers
-        }
-        private static bool ValidateUtilityAmounts(List<dynamic> utilities)
-        {
-            // go through each utilities in transports and check if its a number variable
-            foreach (var utility in utilities)
-            {
-                string amount = utility.Hours;
-                if (!double.TryParse(amount, out _))
-                {
-                    return false; // Invalid non-number value found, return false
-                }
-            }
-            return true; // All amounts are valid numbers
         }
         public static void DeleteFromDatabase(MySqlConnection connection, int userID, string date) {
             // new command
