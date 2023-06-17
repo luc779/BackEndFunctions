@@ -1,14 +1,15 @@
-using Microsoft.AspNetCore.Mvc;
+using System.Net;
 using Microsoft.Azure.Functions.Worker;
-using Microsoft.Extensions.Logging;
-using Microsoft.AspNetCore.Http;
-using Newtonsoft.Json;
+using Microsoft.Azure.Functions.Worker.Http;
 using FirebaseAdmin.Auth;
 using MySqlConnector;
+using NoCO2.Util;
+using Company.Function;
+using Newtonsoft.Json;
 
-namespace Company
+namespace NoCO2.Function
 {
-  public static class CreateUser
+  public class CreateUser
   {
     static CreateUser()
     {
@@ -16,56 +17,57 @@ namespace Company
     }
 
     [Function("CreateUser")]
-    public static async Task<IActionResult> CreateUserWithUserKey(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "create-user")] HttpRequest req,
-        ILogger log)
+    public async Task<HttpResponseData> CreateUserWithUserKey(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "create-user")] HttpRequestData req)
     {
+      var responseBodyObject = new {
+        reply = "InternalError"
+      };
       try
       {
-        // Get post body if any
-        string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-        dynamic data = JsonConvert.DeserializeObject(requestBody);
+        req.Body.TryParseJson<CreateUserBody>(out var requestBody);
 
-        // Get "input" parameter from HTTP request as either parameter or post value
-        string userKey = req.Query["UserKey"];
-        userKey = userKey ?? data?.UserKey;
+        // Get "UserKey" parameter from HTTP request as either parameter or post value
+        string userKey = requestBody?.UserKey;
 
         UserRecord userRecord = await FirebaseAuth.DefaultInstance.GetUserAsync(userKey);
-        // See the UserRecord reference doc for the contents of userRecord.
 
-        try
-        {
-          // Hash the userKey
-          string hashedUserKey = BCrypt.Net.BCrypt.HashPassword(userKey);
+        // Hash the userKey
+        string hashedUserKey = BCrypt.Net.BCrypt.HashPassword(userKey);
 
-          // Check if the database has a user with the same hashedUserKey
-          bool isUserAdded = AddUserToDatabase(hashedUserKey);
-          if (isUserAdded) {
-            return new OkObjectResult("Success");
-          }
-
-          // For some reason, the userkey is not added to the database
-          return new BadRequestObjectResult("InternalError");
-        } catch (Exception e) {
-          return new BadRequestObjectResult("InternalError");
+        // Check if the database has a user with the same hashedUserKey
+        bool isUserAdded = AddUserToDatabase(userKey, hashedUserKey);
+        if (isUserAdded) {
+          responseBodyObject = new {
+            reply = "Success"
+          };
+          return await HttpResponseDataFactory.GetHttpResponseData(req, HttpStatusCode.OK, responseBodyObject);
         }
 
-      } catch (ArgumentException argError) {
-        return new BadRequestObjectResult("InvalidArgument");
-      } catch (FirebaseAuthException authError) {
-        return new BadRequestObjectResult("UserKeyNotAuth");
+        // For some reason, the userkey is not added to the database
+        return await HttpResponseDataFactory.GetHttpResponseData(req, HttpStatusCode.InternalServerError, responseBodyObject);
+      } catch (ArgumentException) {
+        responseBodyObject = new {
+          reply = "InvalidArgument"
+        };
+        return await HttpResponseDataFactory.GetHttpResponseData(req, HttpStatusCode.BadRequest, responseBodyObject);
+      } catch (FirebaseAuthException) {
+        responseBodyObject = new {
+          reply = "UserKeyNotAuth"
+        };
+        return await HttpResponseDataFactory.GetHttpResponseData(req, HttpStatusCode.BadRequest, responseBodyObject);
+      } catch (Exception) {
+        return await HttpResponseDataFactory.GetHttpResponseData(req, HttpStatusCode.InternalServerError, responseBodyObject);
       }
       throw new NotImplementedException();
     }
 
-    private static bool AddUserToDatabase(string hashedUserKey) {
-      string server = "databaseht.cyethqvobvkg.us-west-2.rds.amazonaws.com";
-      string database = "Hackathon";
-      string uid = "masterUsername";
-      string password = "vafwa4-vozqyn-naxqAb";
-      string connectionString = "server=" + server + ";uid=" + uid +";pwd=" + password + ";database=" + database;
+    // TODO: Move all Database related tasks into one class
+    private static bool AddUserToDatabase(string originalUserKey, string hashedUserKey) {
 
-      using (MySqlConnection connection = new MySqlConnection(connectionString))
+      MySqlConnection connection = DatabaseConnecter.MySQLDatabase();
+
+      using (connection)
       {
         connection.Open();
 
@@ -77,20 +79,28 @@ namespace Company
             // Selet UserKey from Users where UserKey is equal to hashedUserKey
             using (MySqlCommand command = connection.CreateCommand())
             {
+              string query = "SELECT USERKEY FROM Users";
               command.Transaction = transaction;
-              command.CommandText = "SELECT USERKEY FROM Users WHERE UserKey = '" + hashedUserKey + "'";
+              command.CommandText = query;
               using MySqlDataReader reader = command.ExecuteReader();
               if (reader.HasRows) {
-                return true;
+                while (reader.Read())
+                {
+                  string hashedUserKeyInDB = reader.GetString(0);
+                  if (BCrypt.Net.BCrypt.Verify(originalUserKey, hashedUserKeyInDB)) {
+                    return true;
+                  }
+                }
               }
             }
 
             // Insert a user to Users table with the hashedUserKey
             using (MySqlCommand command = connection.CreateCommand())
             {
-              string query = "INSERT INTO Users (USERKEY) Values (@USERKEY)";
+              const string userKey = "@USERKEY";
+              const string query = "INSERT INTO Users (USERKEY) Values ("+ userKey +")";
               command.CommandText = query;
-              command.Parameters.AddWithValue("@USERKEY", hashedUserKey);
+              command.Parameters.AddWithValue(userKey, hashedUserKey);
               command.ExecuteNonQuery();
             }
 
@@ -100,7 +110,7 @@ namespace Company
             // Transaction completed successfully
             return true;
           }
-          catch (Exception ex)
+          catch (Exception)
           {
             // An error occurred, rollback the transaction
             transaction.Rollback();
