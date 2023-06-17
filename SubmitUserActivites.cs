@@ -43,7 +43,10 @@ namespace Company
                     // find userKey and return the ID
                     int ID = FindUser(userKey);
                     if (ID == -1) {
-                        return new BadRequestObjectResult("UserNotFound");
+                        responseBodyObject = new {
+                            reply = "UserNotFound"
+                        };
+                        return await HttpResponseDataFactory.GetHttpResponseData(req, HttpStatusCode.OK, responseBodyObject);
                     }
 
                     // Check if the database has a user with the same userKey
