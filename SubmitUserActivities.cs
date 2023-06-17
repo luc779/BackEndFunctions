@@ -6,11 +6,12 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using MySqlConnector;
 using Newtonsoft.Json;
+using NoCO2.Function;
 using NoCO2.Util;
 
 namespace Company
 {
-    public static class SubmitUserActivities
+    public class SubmitUserActivities
     {
         static SubmitUserActivities()
         {
@@ -18,7 +19,7 @@ namespace Company
         }
 
         [Function("SubmitUserActivities")]
-        public static async Task<HttpResponseData> SubmitInformationAsync([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "submit-user-activity")] HttpRequestData req)
+        public async Task<HttpResponseData> SubmitInformationAsync([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "submit-user-activity")] HttpRequestData req)
         {
             var responseBodyObject = new {
                 reply = "InternalError"
@@ -79,7 +80,7 @@ namespace Company
             }
             throw new NotImplementedException();
         }
-        public static bool SubmitActivities(int userID, List<dynamic> transports, List<dynamic> foods, List<dynamic> utilities) {
+        private static bool SubmitActivities(int userID, List<dynamic> transports, List<dynamic> foods, List<dynamic> utilities) {
             // check if the new parameters are valid numbers
             bool validatedNumbers = ValidateActivitiesInput.ValidateNumbers(transports, foods, utilities);
             if (!validatedNumbers) {
@@ -122,7 +123,7 @@ namespace Company
             }
             return true;
         }
-        public static void DeleteFromDatabase(MySqlConnection connection, int userID, string date) {
+        private static void DeleteFromDatabase(MySqlConnection connection, int userID, string date) {
             // new command
             string query = "DELETE FROM Activities WHERE UserID = '" + userID + "' AND DateTime = '" + date + "'";
             using MySqlCommand command = new(query, connection);
@@ -139,7 +140,7 @@ namespace Company
                 throw new Exception();
             }
         }
-        public static void InputTransport(int userID, List<dynamic> transports, MySqlConnection connection, string date, string QUERY) {
+        private static void InputTransport(int userID, List<dynamic> transports, MySqlConnection connection, string date, string QUERY) {
             // new command
             using MySqlCommand command = new(QUERY, connection);
             // start a transaction
@@ -180,7 +181,7 @@ namespace Company
                 throw new Exception(); // makes SubmitActivities rollback
             }
         }
-        public  static void InputFood(int userID, List<dynamic> foods, MySqlConnection connection, string date, string QUERY) {
+        private  static void InputFood(int userID, List<dynamic> foods, MySqlConnection connection, string date, string QUERY) {
             // new command
             using MySqlCommand command = new(QUERY, connection);
             // start transaction
@@ -220,7 +221,7 @@ namespace Company
                 throw new Exception(); // makes SubmitActivities rollback
             }
         }
-        public static void InputUtilities(int userID, List<dynamic> utilities, MySqlConnection connection, string date, string QUERY) {
+        private static void InputUtilities(int userID, List<dynamic> utilities, MySqlConnection connection, string date, string QUERY) {
             // new command
             using MySqlCommand command = new(QUERY, connection);
             // start a transaction

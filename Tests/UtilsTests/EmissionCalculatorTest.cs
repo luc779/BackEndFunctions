@@ -3,7 +3,7 @@ using Xunit;
 
 namespace BackEndFucntions
 {
-    public class EmissionCalculatorTest : IClassFixture<SubmitUserActivities>
+    public class EmissionCalculatorTest
     {
         [Fact]
         public void CorrectGramsToLbsConversion()
