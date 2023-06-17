@@ -1,12 +1,12 @@
 using System.Net;
+using Company.Function;
 using FirebaseAdmin.Auth;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
-using Microsoft.Azure.Functions.Worker.Http;
 using MySqlConnector;
 using Newtonsoft.Json;
 
-namespace Company.Function
+namespace Company
 {
     public static class SubmitUserActivites
     {
@@ -212,7 +212,7 @@ namespace Company.Function
 
             // varaibles that dont change for each unique transport
             const string ACTIVITY_TYPE = "transport";
-            Functions calculations = new();
+            EmissionCalculator calculations = new();
 
             try
             {
@@ -252,7 +252,7 @@ namespace Company.Function
             command.Transaction = connection.BeginTransaction();
             // varaibles that dont change for each unique foods
             const string ACTIVITY_TYPE = "foods";
-            Functions calculations = new();
+            EmissionCalculator calculations = new();
 
             try
             {
@@ -292,7 +292,7 @@ namespace Company.Function
             command.Transaction = connection.BeginTransaction();
             // varaibles that dont change for each unique foods
             const string ACTIVITY_TYPE = "utility";
-            Functions calculations = new();
+            EmissionCalculator calculations = new();
             try
             {
                 foreach (var utility in utilities)

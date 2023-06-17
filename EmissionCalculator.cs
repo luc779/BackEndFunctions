@@ -1,6 +1,6 @@
 namespace Company.Function;
 
-    internal class Functions
+    internal class EmissionCalculator
     {
         // conversion rate 1 kg to lbs
         private const double KG_TO_LBS = 2.20462;

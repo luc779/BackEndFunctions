@@ -1,6 +1,6 @@
 namespace BackEndFucntions
 {
-    public class FunctionsTest
+    public class EmissionCalculatorTest
     {
         
     }
