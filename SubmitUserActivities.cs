@@ -26,16 +26,14 @@ namespace Company
             };
             try
             {
-                string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-                dynamic data = JsonConvert.DeserializeObject(requestBody);
+                req.Body.TryParseJson<SubmitUserActivitiesBody>(out var requestBody);
 
                 // Get "input" parameter from HTTP request as either parameter or post value
-                string userKey = req.Query["userKey"];
-                userKey ??= data?.userKey;
+                string userKey = requestBody?.UserKey;
 
-                List<dynamic> transports = data.Transports;
-                List<dynamic> foods = data.Foods;
-                List<dynamic> utilities = data.Utilities;
+                List<dynamic> transports = requestBody?.Transports;
+                List<dynamic> foods = requestBody?.Foods;
+                List<dynamic> utilities = requestBody?.Utilities;
 
                 UserRecord userRecord = await FirebaseAuth.DefaultInstance.GetUserAsync(userKey);
                 // See the UserRecord reference doc for the contents of userRecord.
@@ -59,6 +57,9 @@ namespace Company
                         };
                         return await HttpResponseDataFactory.GetHttpResponseData(req, HttpStatusCode.OK, responseBodyObject);
                     } else {
+                        responseBodyObject = new {
+                            reply = "SubmitActivitiesError"
+                        };
                         return await HttpResponseDataFactory.GetHttpResponseData(req, HttpStatusCode.InternalServerError, responseBodyObject);
                     }
                 }
@@ -77,6 +78,9 @@ namespace Company
                     reply = "UserKeyNotAuth"
                 };
                 return await HttpResponseDataFactory.GetHttpResponseData(req, HttpStatusCode.BadRequest, responseBodyObject);
+            }
+            catch (Exception) {
+                return await HttpResponseDataFactory.GetHttpResponseData(req, HttpStatusCode.InternalServerError, responseBodyObject);
             }
             throw new NotImplementedException();
         }
