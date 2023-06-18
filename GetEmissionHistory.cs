@@ -5,6 +5,7 @@ using Microsoft.Azure.Functions.Worker.Http;
 using MySqlConnector;
 using NoCO2.Util;
 using Company.Function;
+using BackEndFucntions;
 
 namespace NoCO2.Function
 {
@@ -31,7 +32,7 @@ namespace NoCO2.Function
         // Get "UserKey" parameter from HTTP request as either parameter or post value
         string userKey = requestBody?.UserKey;
         UserRecord userRecord = await FirebaseAuth.DefaultInstance.GetUserAsync(userKey);
-        int matchedUserID = GetUserIdIfUserKeyExistsInDB(userKey);
+        int matchedUserID = FindUser.UserFinder(userKey);
 
         if (matchedUserID == -1)
         {
