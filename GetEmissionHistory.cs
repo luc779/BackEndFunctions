@@ -66,40 +66,6 @@ namespace NoCO2.Function
       throw new NotImplementedException();
     }
 
-    private int GetUserIdIfUserKeyExistsInDB(string userKey) {
-      MySqlConnection connection = DatabaseConnecter.MySQLDatabase();
-
-      using (connection)
-      {
-        connection.Open();
-
-        try
-        {
-          using (MySqlCommand command = connection.CreateCommand())
-          {
-            string query = "SELECT ID, UserKey FROM Users";
-            command.CommandText = query;
-            using MySqlDataReader reader = command.ExecuteReader();
-            if (reader.HasRows) {
-              while (reader.Read())
-              {
-                string hashedUserKeyInDB = reader.GetString(1);
-                if (BCrypt.Net.BCrypt.Verify(userKey, hashedUserKeyInDB)) {
-                  connection.Close();
-                  return reader.GetInt32("ID");
-                }
-              }
-            }
-          }
-          connection.Close();
-          return -1;
-        } catch (Exception) {
-          connection.Close();
-          return -1;
-        }
-      }
-    }
-
     private async Task<List<DailyEmission>> GetDailyEmissionsForUserWithinOneYear(int userId)
     {
       DateTime currentDate = DateTime.UtcNow;
