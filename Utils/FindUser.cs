@@ -29,7 +29,6 @@ namespace BackEndFucntions
                         break;
                     }
                 }
-                command.Transaction.Commit();
                 return ID;
             }
             catch (MySqlException)

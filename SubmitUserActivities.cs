@@ -46,7 +46,7 @@ namespace Company
                         responseBodyObject = new {
                             reply = "UserNotFound"
                         };
-                        return await HttpResponseDataFactory.GetHttpResponseData(req, HttpStatusCode.OK, responseBodyObject);
+                        return await HttpResponseDataFactory.GetHttpResponseData(req, HttpStatusCode.BadRequest, responseBodyObject);
                     }
 
                     // Check if the database has a user with the same userKey
@@ -103,6 +103,11 @@ namespace Company
 
                     // delete previous entries
                     DeleteFromDatabase(connection, userID, date);
+
+                    // all are null no need to update database
+                    if (transports.Count == 0 && foods.Count == 0 && utilities.Count == 0) {
+                        return true;
+                    }
 
                     // input new entries using same query
                     const string QUERY = "INSERT INTO Activities (UserID, ActivityType, Method, Amount, DateTime, Emission) Values (@UserID, @ActivityType, @Method, @Amount, @DateTime, @Emission)";

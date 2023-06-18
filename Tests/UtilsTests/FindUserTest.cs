@@ -7,9 +7,9 @@ namespace BackEndFucntions.Tests.UtilsTests
         [Fact]
         public static void DatabaseNotFound()
         {
-            const string ID = "0";
+            const string USER_KEY = "0";
             const int EXPECTED_RESULT = -1;
-            int returnedVal = FindUser.UserFinder(ID);
+            int returnedVal = FindUser.UserFinder(USER_KEY);
             Assert.Equal(EXPECTED_RESULT, returnedVal);
         }
 
@@ -19,8 +19,8 @@ namespace BackEndFucntions.Tests.UtilsTests
             const string expectedErrorMessage = "DatabaseIssue";
             try
             {
-                const string ID = "0303";
-                int returnedVal = FindUser.UserFinder(ID);
+                const string USER_KEY = "0303";
+                int returnedVal = FindUser.UserFinder(USER_KEY);
                 throw new Exception(expectedErrorMessage);
             }
             catch (Exception ex)
