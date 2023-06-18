@@ -8,14 +8,19 @@ public static class FirebaseInitializer
     {
         if (!isInitialized)
         {
-            string credentialsPath = "../../../Properties/noco2-e46fa-firebase-adminsdk-fta0k-c6f39e61a6.json";
+            try {
+                string credentialsPath = "../../../Properties/noco2-e46fa-firebase-adminsdk-fta0k-c6f39e61a6.json";
 
-            FirebaseApp.Create(new AppOptions()
-            {
-                Credential = GoogleCredential.FromFile(credentialsPath)
-            });
+                FirebaseApp.Create(new AppOptions()
+                {
+                    Credential = GoogleCredential.FromFile(credentialsPath)
+                });
 
-            isInitialized = true;
+                isInitialized = true;
+            } catch (ArgumentException) {
+                Console.WriteLine("Firebase Initialized");
+            }
+
         }
     }
 }
