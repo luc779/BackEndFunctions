@@ -1,6 +1,6 @@
 using Xunit;
 
-namespace BackEndFucntions.Tests.UtilsTests
+namespace BackEndFunctions.Tests.UtilsTests
 {
     public static class FindUserTest
     {

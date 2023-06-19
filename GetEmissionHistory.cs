@@ -5,7 +5,7 @@ using Microsoft.Azure.Functions.Worker.Http;
 using MySqlConnector;
 using NoCO2.Util;
 using Company.Function;
-using BackEndFucntions;
+using BackEndFunctions;
 
 namespace NoCO2.Function
 {

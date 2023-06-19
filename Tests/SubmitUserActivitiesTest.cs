@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 using NoCO2.Test.Util;
 using Xunit;
 
-namespace BackEndFucntions
+namespace BackEndFunctions
 {
     public class SubmitUserActivitiesTest : IClassFixture<SubmitUserActivities>
     {

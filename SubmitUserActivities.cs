@@ -1,5 +1,5 @@
 using System.Net;
-using BackEndFucntions;
+using BackEndFunctions;
 using Company.Function;
 using FirebaseAdmin.Auth;
 using Microsoft.Azure.Functions.Worker;
@@ -307,7 +307,7 @@ namespace Company
             // read table DailyEmissions
             string query = "SELECT * FROM DailyEmissions WHERE UserID = '" + userID + "' AND DateTime = '" + todaysDate + "' FOR UPDATE";
             using MySqlCommand command = new(query, connection);
-            // start a transaciton 
+            // start a transaciton
             command.Transaction = connection.BeginTransaction();
             try
             {
