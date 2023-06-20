@@ -5,7 +5,6 @@ using FirebaseAdmin.Auth;
 using MySqlConnector;
 using NoCO2.Util;
 using Company.Function;
-using Newtonsoft.Json;
 
 namespace NoCO2.Function
 {
