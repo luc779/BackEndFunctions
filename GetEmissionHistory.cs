@@ -116,16 +116,11 @@ namespace NoCO2.Function
                   .Select(offset => oneYearAgo.AddDays(offset).Date)
                   .ToList();
 
-              List<DateTime> existingDates = emissions.Select(e => e.DateTime).ToList();
+              List<DateTime> existingDates = emissions.ConvertAll(new Converter<DailyEmission, DateTime>(ConvertToDateTime));
 
               List<DateTime> missingDates = allDates.Except(existingDates).ToList();
 
-              emissions.AddRange(missingDates.Select(date => new DailyEmission
-              {
-                DateTime = date,
-                Total = null,
-                Goal = EMISSION_GOAL
-              }));
+              emissions.AddRange(missingDates.ConvertAll(new Converter<DateTime, DailyEmission>(ConvertToEmptyEmission)));
               connection.Close();
               return emissions.OrderBy(e => e.DateTime).ToList();
             }
@@ -135,6 +130,20 @@ namespace NoCO2.Function
           }
         }
       }
+    }
+
+    public static DateTime ConvertToDateTime(DailyEmission e)
+    {
+      return e.DateTime;
+    }
+
+    public static DailyEmission ConvertToEmptyEmission(DateTime date) {
+      return new DailyEmission
+        {
+          DateTime = date,
+          Total = null,
+          Goal = EMISSION_GOAL
+        };
     }
   }
 }
