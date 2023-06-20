@@ -77,7 +77,7 @@ namespace NoCO2.Function
       {
         connection.Open();
 
-        string query = "SELECT e.DateTime, e.TotalAmount, e.Goal " +
+        const string query = "SELECT e.DateTime, e.TotalAmount, e.Goal " +
                "FROM DailyEmission AS e " +
                "JOIN Users AS u ON e.UserID = u.ID " +
                "WHERE u.ID = @userId AND e.DateTime >= '@oneYearAgo' AND e.DateTime <= '@currentDate'" +
