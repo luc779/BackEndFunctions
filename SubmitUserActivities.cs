@@ -164,9 +164,9 @@ namespace Company
             foreach (var transport in transports)
             {
                 // transportation type
-                string method = transport.TransportType;
+                string method = transport.Type;
                 // amount of miles driven
-                double amount = transport.Miles;
+                double amount = transport.Amount;
 
                 // calculate emissions with, method (transportation type), and amount (miles driven)
                 double emission = calculations.DrivingCalculation(method, amount);
@@ -195,7 +195,7 @@ namespace Company
             // start transaction
             command.Transaction = connection.BeginTransaction();
             // varaibles that dont change for each unique foods
-            const string ACTIVITY_TYPE = "foods";
+            const string ACTIVITY_TYPE = "food";
             EmissionCalculator calculations = new();
 
             try
@@ -204,7 +204,7 @@ namespace Company
             foreach (var food in foods)
             {
                 // food type eaten
-                string method = food.FoodType;
+                string method = food.Type;
                 // amount of food eaten
                 double amount = food.Amount;
 
@@ -242,9 +242,9 @@ namespace Company
                 foreach (var utility in utilities)
                 {
                     // get the utility type
-                    string method = utility.UtilityType;
+                    string method = utility.Type;
                     // get hours used
-                    double amount = utility.Hours;
+                    double amount = utility.Amount;
                     // calculate the utilities emission
                     double emission = calculations.UtilitiesCalculation(method, amount);
                     if (emission == -1)
