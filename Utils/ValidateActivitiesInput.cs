@@ -1,4 +1,4 @@
-namespace BackEndFucntions
+namespace BackEndFunctions
 {
     public static class ValidateActivitiesInput
     {

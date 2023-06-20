@@ -1,7 +1,7 @@
 using Company.Function;
 using Xunit;
 
-namespace BackEndFucntions
+namespace BackEndFunctions
 {
     public class EmissionCalculatorTest
     {

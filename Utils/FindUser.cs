@@ -1,7 +1,7 @@
 using Company.Function;
 using MySqlConnector;
 
-namespace BackEndFucntions
+namespace BackEndFunctions
 {
     public static class FindUser
     {
