@@ -98,7 +98,7 @@ namespace NoCO2.Function
             // Insert a user to Users table with the hashedUserKey
             using (MySqlCommand command = connection.CreateCommand())
             {
-              const string userKey = "@USERKEY";
+              const string userKey = "@userKey";
               const string query = "INSERT INTO Users (UserKey) Values ("+ userKey +")";
               command.CommandText = query;
               command.Transaction = transaction;
