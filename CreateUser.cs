@@ -88,6 +88,7 @@ namespace NoCO2.Function
                 {
                   string hashedUserKeyInDB = reader.GetString(0);
                   if (BCrypt.Net.BCrypt.Verify(originalUserKey, hashedUserKeyInDB)) {
+                    connection.Close();
                     return true;
                   }
                 }
@@ -109,6 +110,7 @@ namespace NoCO2.Function
             transaction.Commit();
 
             // Transaction completed successfully
+            connection.Close();
             return true;
           }
           catch (Exception)
@@ -117,6 +119,7 @@ namespace NoCO2.Function
             transaction.Rollback();
 
             // Handle the exception
+            connection.Close();
             return false;
           }
         }
