@@ -9,7 +9,7 @@ using NoCO2.Util;
 
 namespace Company.Function
 {
-    public class GetUserActivitie
+    public class GetUserActivities
     {
         class ReturnedInfo
         {
@@ -23,13 +23,13 @@ namespace Company.Function
                 Utilities = utilities;
             }
         }
-        public GetUserActivitie()
+        public GetUserActivities()
         {
             FirebaseInitializer.Initialize();
         }
 
-        [Function("GetUserActivitie")]
-        public async Task<HttpResponseData> GetActivities([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = = "get-user-activities")] HttpRequestData req)
+        [Function("GetUserActivities")]
+        public async Task<HttpResponseData> GetActivities([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "get-user-activities")] HttpRequestData req)
         {
             var responseBodyObject = new {
                 reply = "InternalError"
@@ -61,6 +61,7 @@ namespace Company.Function
                         Foods = information.Foods,
                         Utilities = information.Utilities
                     };
+                    return await HttpResponseDataFactory.GetHttpResponseData(req, HttpStatusCode.OK, successresponseBodyObject);
                 }
                 catch (Exception) {
                     return await HttpResponseDataFactory.GetHttpResponseData(req, HttpStatusCode.InternalServerError, responseBodyObject);
