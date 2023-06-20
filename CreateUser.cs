@@ -79,7 +79,7 @@ namespace NoCO2.Function
             // Selet UserKey from Users where UserKey is equal to hashedUserKey
             using (MySqlCommand command = connection.CreateCommand())
             {
-              string query = "SELECT USERKEY FROM Users";
+              const string query = "SELECT UserKey FROM Users";
               command.Transaction = transaction;
               command.CommandText = query;
               using MySqlDataReader reader = command.ExecuteReader();
@@ -98,8 +98,9 @@ namespace NoCO2.Function
             using (MySqlCommand command = connection.CreateCommand())
             {
               const string userKey = "@USERKEY";
-              const string query = "INSERT INTO Users (USERKEY) Values ("+ userKey +")";
+              const string query = "INSERT INTO Users (UserKey) Values ("+ userKey +")";
               command.CommandText = query;
+              command.Transaction = transaction;
               command.Parameters.AddWithValue(userKey, hashedUserKey);
               command.ExecuteNonQuery();
             }
