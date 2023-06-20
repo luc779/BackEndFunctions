@@ -93,7 +93,7 @@ namespace NoCO2.Function
 
           using (MySqlDataReader reader = await command.ExecuteReaderAsync())
           {
-            List<DailyEmission> emissions = new List<DailyEmission>();
+            List<DailyEmission> emissions = new ();
             const string DATE_TIME_COL = "DateTime";
             const string TOTAL_AMOUNT_COL = "TotalAmount";
             const string GOAL_COL = "Goal";
