@@ -58,5 +58,23 @@ namespace NoCO2.Test
       Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
       Assert.Equal("{\"reply\":\"UserKeyNotAuth\"}", await response.GetResponseBody());
     }
+
+    [Fact]
+    public async Task GetUserEmissionStatistics()
+    {
+      var user = new {
+        UserKey = "pGIWAl55j3XH4LFHbXgsdtoM46j2"
+      };
+      string body = JsonConvert.SerializeObject(user);
+
+      var request = TestFactory.CreateHttpRequest(body, "get");
+      var response = await _getEmissionStatistics.GetEmissionStatisticsWithUserKey(request);
+
+      Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+      // Verify that the response content has the expected format
+      string content = await response.GetResponseBody();
+      Assert.Matches(@"\{\s*""reply"":\s*""Success"",\s*""Statistics"":\s*\[.*\]\s*}", content);
+    }
   }
 }
