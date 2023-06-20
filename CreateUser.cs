@@ -5,7 +5,6 @@ using FirebaseAdmin.Auth;
 using MySqlConnector;
 using NoCO2.Util;
 using Company.Function;
-using Newtonsoft.Json;
 
 namespace NoCO2.Function
 {
@@ -79,7 +78,7 @@ namespace NoCO2.Function
             // Selet UserKey from Users where UserKey is equal to hashedUserKey
             using (MySqlCommand command = connection.CreateCommand())
             {
-              string query = "SELECT USERKEY FROM Users";
+              const string query = "SELECT UserKey FROM Users";
               command.Transaction = transaction;
               command.CommandText = query;
               using MySqlDataReader reader = command.ExecuteReader();
@@ -88,6 +87,7 @@ namespace NoCO2.Function
                 {
                   string hashedUserKeyInDB = reader.GetString(0);
                   if (BCrypt.Net.BCrypt.Verify(originalUserKey, hashedUserKeyInDB)) {
+                    connection.Close();
                     return true;
                   }
                 }
@@ -97,9 +97,10 @@ namespace NoCO2.Function
             // Insert a user to Users table with the hashedUserKey
             using (MySqlCommand command = connection.CreateCommand())
             {
-              const string userKey = "@USERKEY";
-              const string query = "INSERT INTO Users (USERKEY) Values ("+ userKey +")";
+              const string userKey = "@userKey";
+              const string query = "INSERT INTO Users (UserKey) Values ("+ userKey +")";
               command.CommandText = query;
+              command.Transaction = transaction;
               command.Parameters.AddWithValue(userKey, hashedUserKey);
               command.ExecuteNonQuery();
             }
@@ -108,6 +109,7 @@ namespace NoCO2.Function
             transaction.Commit();
 
             // Transaction completed successfully
+            connection.Close();
             return true;
           }
           catch (Exception)
@@ -116,6 +118,7 @@ namespace NoCO2.Function
             transaction.Rollback();
 
             // Handle the exception
+            connection.Close();
             return false;
           }
         }
