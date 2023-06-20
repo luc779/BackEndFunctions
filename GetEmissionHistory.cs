@@ -66,7 +66,7 @@ namespace NoCO2.Function
       throw new NotImplementedException();
     }
 
-    private async Task<List<DailyEmission>> GetDailyEmissionsForUserWithinOneYear(int userId)
+    private static async Task<List<DailyEmission>> GetDailyEmissionsForUserWithinOneYear(int userId)
     {
       DateTime currentDate = DateTime.UtcNow;
       DateTime oneYearAgo = currentDate.AddYears(-1);
