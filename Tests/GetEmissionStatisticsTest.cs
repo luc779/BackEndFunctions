@@ -43,5 +43,20 @@ namespace NoCO2.Test
       Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
       Assert.Equal("{\"reply\":\"InvalidArgument\"}", await response.GetResponseBody());
     }
+
+    [Fact]
+    public async Task UserKeyNotAuth()
+    {
+      var user = new {
+        UserKey = "RandomRandomRandomRandomRandomRandom"
+      };
+      string body = JsonConvert.SerializeObject(user);
+
+      var request = TestFactory.CreateHttpRequest(body, "get");
+      var response = await _getEmissionStatistics.GetEmissionStatisticsWithUserKey(request);
+
+      Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+      Assert.Equal("{\"reply\":\"UserKeyNotAuth\"}", await response.GetResponseBody());
+    }
   }
 }
