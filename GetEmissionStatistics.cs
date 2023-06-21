@@ -41,10 +41,12 @@ namespace NoCO2.Function
           return await HttpResponseDataFactory.GetHttpResponseData(req, HttpStatusCode.BadRequest, responseBodyObject);
         }
 
-        List<EmissionStatistic> statistics;
+        StatisticsCalculator calculator = new();
+        List<EmissionStatistic> statistics = calculator.GetUserEmissionStatistics(matchedUserID);
         // Format the list of emissions into an object for HttpResponseData
         var successResponseBodyObject = new {
-            reply = "Success"
+            reply = "Success",
+            Statistics = statistics
         };
         return await HttpResponseDataFactory.GetHttpResponseData(req, HttpStatusCode.OK, successResponseBodyObject);
       } catch (ArgumentException) {
