@@ -41,6 +41,7 @@ namespace NoCO2.Function
           return await HttpResponseDataFactory.GetHttpResponseData(req, HttpStatusCode.BadRequest, responseBodyObject);
         }
 
+        List<EmissionStatistic> statistics;
         // Format the list of emissions into an object for HttpResponseData
         var successResponseBodyObject = new {
             reply = "Success"
