@@ -30,5 +30,18 @@ namespace NoCO2.Test
       Assert.NotEmpty(statistic.Topic);
       Assert.NotEmpty(statistic.Stat);
     }
+
+    [Fact]
+    public void GetUserEmissionDifference()
+    {
+      const int USER_ID = 0;
+      StatisticsCalculator calculator = new();
+
+      EmissionStatistic statistic = calculator.GetEmissionDifferenceByUserID(USER_ID);
+
+      Assert.NotEmpty(statistic.Statistic);
+      Assert.NotEmpty(statistic.Topic);
+      Assert.NotEmpty(statistic.Stat);
+    }
   }
 }

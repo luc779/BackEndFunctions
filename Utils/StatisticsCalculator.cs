@@ -127,4 +127,14 @@ internal class StatisticsCalculator
       Stat = average.ToString("0.00")
     };
   }
+
+  public EmissionStatistic GetEmissionDifferenceByUserID(int userID)
+  {
+    return new EmissionStatistic
+    {
+      Statistic = "Emission Difference",
+      Topic = "Between 2 Weeks",
+      Stat = null
+    };
+  }
 }
