@@ -1,4 +1,5 @@
 using System.Net;
+using BackEndFucntions;
 using BackEndFunctions;
 using FirebaseAdmin.Auth;
 using Microsoft.Azure.Functions.Worker;
@@ -91,35 +92,13 @@ namespace Company.Function
             const string TRANSPORT = "transport";
             const string FOOD = "food";
             const string UTILITY = "utility";
-            List<dynamic> Transports = RetrieveCertainType(userID, today, TRANSPORT);
-            List<dynamic> Foods = RetrieveCertainType(userID, today, FOOD);
-            List<dynamic> Utilities = RetrieveCertainType(userID, today, UTILITY);
+
+            // use data retrieval class to retrieve specfic type data
+            DataRetrieval retrieveData = new();
+            List<dynamic> Transports = retrieveData.RetrieveCertainType(userID, today, TRANSPORT);
+            List<dynamic> Foods = retrieveData.RetrieveCertainType(userID, today, FOOD);
+            List<dynamic> Utilities = retrieveData.RetrieveCertainType(userID, today, UTILITY);
             return new ReturnedInfo(Transports, Foods, Utilities);
-        }
-
-        public static List<dynamic> RetrieveCertainType(int userID, DateTime today, string ACTIVITY_TYPE)
-        {
-            List<dynamic> Transports = null;
-            string QUERY = "SELECT FROM Activities WHERE UserID = '" + userID + "' AND DateTime = '" + today.ToString("yyyy/MM/dd") + "' AND ActivityType = '" + ACTIVITY_TYPE + "'";
-
-            using MySqlConnection connetion = DatabaseConnecter.MySQLDatabase();
-            connetion.Open();
-
-            using MySqlCommand command = new(QUERY, connetion);
-
-            try {
-                command.CommandText = QUERY;
-                using MySqlDataReader reader = command.ExecuteReader();
-                while (reader.Read()) {
-                    string type = reader.GetString("Method");
-                    double amount = reader.GetDouble("Amount");
-                    Transports.Add(new {Type = type, Amount = amount});
-                }
-                return Transports;
-            }
-            catch (Exception) {
-                throw new Exception();
-            }
         }
     }
 }

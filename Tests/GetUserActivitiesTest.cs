@@ -25,5 +25,17 @@ namespace BackEndFucntions
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
             Assert.Equal("{\"reply\":\"InvalidArgument\"}", await response.GetResponseBody());
         }
+        [Fact]
+        public async Task RetrieveInformation()
+        {
+            var user = new {};
+            string body = JsonConvert.SerializeObject(user);
+
+            var request = TestFactory.CreateHttpRequest(body, "post");
+            var response = await _getUserActivities.GetActivities(request);
+
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+            Assert.Equal("{\"reply\":\"InvalidArgument\"}", await response.GetResponseBody());
+        }
     }
 }
