@@ -11,7 +11,7 @@ namespace NoCO2.Test
       const int USER_ID = 0;
       StatisticsCalculator calculator = new();
 
-      EmissionStatistic statistic = calculator.GetHighestEmissionActivitybyUserID(USER_ID);
+      EmissionStatistic statistic = calculator.GetHighestEmissionActivityByUserID(USER_ID);
 
       Assert.NotEmpty(statistic.Statistic);
       Assert.NotEmpty(statistic.Topic);

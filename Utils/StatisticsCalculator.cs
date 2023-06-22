@@ -8,7 +8,7 @@ internal class StatisticsCalculator
     return statistics;
   }
 
-  public EmissionStatistic GetHighestEmissionActivitybyUserID(int userID)
+  public EmissionStatistic GetHighestEmissionActivityByUserID(int userID)
   {
     return new EmissionStatistic {Statistic = null, Topic = null, Stat = null};
   }
