@@ -29,8 +29,8 @@ internal class StatisticsCalculator
     {
       connection.Open();
 
-      const string query = "SELECT a.ActivityType, a.Emission" +
-        "FROM Activities AS a" +
+      const string query = "SELECT a.ActivityType, a.Emission " +
+        "FROM Activities AS a " +
         "JOIN Users AS u ON a.UserID = u.ID " +
         "WHERE u.ID = @userId AND a.DateTime >= '@oneWeekAgo' AND a.DateTime <= '@currentDate'";
 
