@@ -1,6 +1,5 @@
 using MySqlConnector;
 using Company.Function;
-using System.Collections.Generic;
 
 namespace NoCO2.Util;
 
@@ -18,6 +17,12 @@ internal class StatisticsCalculator
     DateTime currentDate = DateTime.UtcNow;
     DateTime oneWeekAgo = currentDate.AddDays(-7);
 
+    Dictionary<string, double> emissionsDict = new();
+    emissionsDict.Add("transport", 0);
+    emissionsDict.Add("foods", 0);
+    emissionsDict.Add("utility", 0);
+
+    // Retrieve emission per activity type from database
     MySqlConnection connection = DatabaseConnecter.MySQLDatabase();
 
     using (connection)
@@ -38,19 +43,37 @@ internal class StatisticsCalculator
       using MySqlDataReader reader = command.ExecuteReader();
       if (reader.HasRows)
       {
-        Dictionary<string, double> emissionsDict = new();
-        emissionsDict.Add("transport", 0);
-        emissionsDict.Add("foods", 0);
-        emissionsDict.Add("utility", 0);
         while (reader.Read())
         {
           string activityType = reader.GetString("ActivityType");
           if (emissionsDict.ContainsKey(activityType)) {
             emissionsDict[activityType] += reader.GetDouble("Emission");
+          } else {
+            Console.WriteLine("ALERT (GetHighestEmissionActivityByUserID): ActivityType read from query does not exists in emissionDict: " + activityType);
           }
         }
+      } else {
+        connection.Close();
+        return null;
       }
+      connection.Close();
     }
-    return new EmissionStatistic {Statistic = null, Topic = null, Stat = null};
+
+    // Calculate percentage
+    double sum = emissionsDict.Values.Sum();
+    emissionsDict["transport"] = emissionsDict["transport"] / sum;
+    emissionsDict["foods"] = emissionsDict["foods"] / sum;
+    emissionsDict["utility"] = emissionsDict["utility"] / sum;
+
+    // Determine the highest emission activity
+    KeyValuePair<string, double> highestEmissionActivity = emissionsDict
+      .OrderByDescending(keyValue => keyValue.Value)
+      .FirstOrDefault();
+    return new EmissionStatistic
+    {
+      Statistic = "Highest Emission Activity",
+      Topic = char.ToUpper(highestEmissionActivity.Key[0]) + highestEmissionActivity.Key.Substring(1),
+      Stat = highestEmissionActivity.Value.ToString("0.00")
+    };
   }
 }
