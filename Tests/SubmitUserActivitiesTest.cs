@@ -29,20 +29,20 @@ namespace BackEndFunctions
         [Fact]
         public async Task UserNotExistsInDatabase()
         {
-        // input test userKey
-        var user = new {
-            UserKey = "RandomRandomRandomRandomRandomRandom",
-            Transports = new List<(string, double)>(),
-            Foods = new List<(string, double)>(),
-            Utilities = new List<(string, double)>()
-        };
-        string body = JsonConvert.SerializeObject(user);
+            // input test userKey
+            var user = new {
+                UserKey = "RandomRandomRandomRandomRandomRandom",
+                Transports = new List<(string, double)>(),
+                Foods = new List<(string, double)>(),
+                Utilities = new List<(string, double)>()
+            };
+            string body = JsonConvert.SerializeObject(user);
 
-        var request = TestFactory.CreateHttpRequest(body, "post");
-        var response = await _submitUserActivities.SubmitInformationAsync(request);
+            var request = TestFactory.CreateHttpRequest(body, "post");
+            var response = await _submitUserActivities.SubmitInformationAsync(request);
 
-        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-        Assert.Equal("{\"reply\":\"UserKeyNotAuth\"}", await response.GetResponseBody());
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+            Assert.Equal("{\"reply\":\"UserKeyNotAuth\"}", await response.GetResponseBody());
         }
     }
 }
