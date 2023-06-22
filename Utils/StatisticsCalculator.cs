@@ -79,6 +79,46 @@ internal class StatisticsCalculator
 
   public EmissionStatistic GetAverageEmissionByUserID(int userID)
   {
+    DateTime currentDate = DateTime.UtcNow;
+    DateTime oneWeekAgo = currentDate.AddDays(-7);
+    double totalEmission = 0;
+    int numEntries = 0;
+
+    // Retrieve DailyEmission.TotalEmission with a week
+    MySqlConnection connection = DatabaseConnecter.MySQLDatabase();
+
+    using (connection)
+    {
+      connection.Open();
+
+      const string query = "SELECT e.TotalAmount FROM DailyEmission AS e " +
+        "JOIN Users AS u ON e.UserID = u.ID " +
+        "WHERE u.ID = @userId AND e.DateTime >= '@oneWeekAgo' AND e.DateTime <= '@currentDate'";
+
+      using MySqlCommand command = connection.CreateCommand();
+      command.CommandText = query;
+      command.Parameters.AddWithValue("@userId", userID);
+      command.Parameters.AddWithValue("@oneWeekAgo", oneWeekAgo.ToString("yyyy/MM/dd"));
+      command.Parameters.AddWithValue("@currentDate", currentDate.ToString("yyyy/MM/dd"));
+
+      using MySqlDataReader reader = command.ExecuteReader();
+      if (reader.HasRows)
+      {
+        while (reader.Read())
+        {
+          double dailyTotalEmission = reader.GetDouble("TotalAmount");
+          totalEmission += dailyTotalEmission;
+          numEntries += 1;
+        }
+      } else {
+        connection.Close();
+        return null;
+      }
+      connection.Close();
+    }
+
+    // Average the sum of total emission with how many entries retrieved
+
     return new EmissionStatistic
     {
       Statistic = "Average Emission",
