@@ -76,4 +76,14 @@ internal class StatisticsCalculator
       Stat = highestEmissionActivity.Value.ToString("0.00")
     };
   }
+
+  public EmissionStatistic GetAverageEmissionByUserID(int userID)
+  {
+    return new EmissionStatistic
+    {
+      Statistic = "Average Emission",
+      Topic = "Within 1 Week",
+      Stat = null
+    };
+  }
 }

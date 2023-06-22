@@ -17,5 +17,18 @@ namespace NoCO2.Test
       Assert.NotEmpty(statistic.Topic);
       Assert.NotEmpty(statistic.Stat);
     }
+
+    [Fact]
+    public void GetUserAverageEmission()
+    {
+      const int USER_ID = 0;
+      StatisticsCalculator calculator = new();
+
+      EmissionStatistic statistic = calculator.GetAverageEmissionByUserID(USER_ID);
+
+      Assert.NotEmpty(statistic.Statistic);
+      Assert.NotEmpty(statistic.Topic);
+      Assert.NotEmpty(statistic.Stat);
+    }
   }
 }
