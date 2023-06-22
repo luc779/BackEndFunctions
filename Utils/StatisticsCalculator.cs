@@ -1,4 +1,4 @@
-namespace Company.Function;
+namespace NoCO2.Util;
 
 internal class StatisticsCalculator
 {
