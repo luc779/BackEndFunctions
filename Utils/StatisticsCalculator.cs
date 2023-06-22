@@ -118,12 +118,13 @@ internal class StatisticsCalculator
     }
 
     // Average the sum of total emission with how many entries retrieved
+    double average = totalEmission / numEntries;
 
     return new EmissionStatistic
     {
       Statistic = "Average Emission",
       Topic = "Within 1 Week",
-      Stat = null
+      Stat = average.ToString("0.00")
     };
   }
 }
