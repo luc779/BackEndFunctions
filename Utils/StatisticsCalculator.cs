@@ -81,9 +81,53 @@ internal class StatisticsCalculator
   {
     DateTime currentDate = DateTime.UtcNow;
     DateTime oneWeekAgo = currentDate.AddDays(-7);
+
+    // Average the sum of total emission with how many entries retrieved
+    double average = GetAverageEmissionBetweenTwoDate(currentDate, oneWeekAgo, userID);
+    if (average == -1)
+    {
+      return null;
+    }
+
+    return new EmissionStatistic
+    {
+      Statistic = "Average Emission",
+      Topic = "Within 1 Week",
+      Stat = average.ToString("0.00")
+    };
+  }
+
+  public EmissionStatistic GetEmissionDifferenceByUserID(int userID)
+  {
+    DateTime currentDate = DateTime.UtcNow;
+    DateTime oneWeekAgo = currentDate.AddDays(-7);
+    DateTime twoWeekAgo = currentDate.AddDays(-14);
+
+    // Retrieve DailyEmission.TotalEmission with a current week
+    double currentAverageEmission = GetAverageEmissionBetweenTwoDate(currentDate, oneWeekAgo, userID);
+    if (currentAverageEmission == -1)
+    {
+      return null;
+    }
+
+    double previousWeekAverageEmission = GetAverageEmissionBetweenTwoDate(oneWeekAgo, twoWeekAgo, userID);
+    if (previousWeekAverageEmission == -1)
+    {
+      return null;
+    }
+    return new EmissionStatistic
+    {
+      Statistic = "Emission Difference",
+      Topic = "Between 2 Weeks",
+      Stat = null
+    };
+  }
+
+  public double GetAverageEmissionBetweenTwoDate(DateTime currentDate, DateTime previousDate, int userID)
+  {
     double totalEmission = 0;
     int numEntries = 0;
-
+    double averageEmission = -1;
     // Retrieve DailyEmission.TotalEmission with a week
     MySqlConnection connection = DatabaseConnecter.MySQLDatabase();
 
@@ -93,12 +137,12 @@ internal class StatisticsCalculator
 
       const string query = "SELECT e.TotalAmount FROM DailyEmission AS e " +
         "JOIN Users AS u ON e.UserID = u.ID " +
-        "WHERE u.ID = @userId AND e.DateTime >= '@oneWeekAgo' AND e.DateTime <= '@currentDate'";
+        "WHERE u.ID = @userId AND e.DateTime >= '@previousDate' AND e.DateTime <= '@currentDate'";
 
       using MySqlCommand command = connection.CreateCommand();
       command.CommandText = query;
       command.Parameters.AddWithValue("@userId", userID);
-      command.Parameters.AddWithValue("@oneWeekAgo", oneWeekAgo.ToString("yyyy/MM/dd"));
+      command.Parameters.AddWithValue("@previousDate", previousDate.ToString("yyyy/MM/dd"));
       command.Parameters.AddWithValue("@currentDate", currentDate.ToString("yyyy/MM/dd"));
 
       using MySqlDataReader reader = command.ExecuteReader();
@@ -112,29 +156,12 @@ internal class StatisticsCalculator
         }
       } else {
         connection.Close();
-        return null;
+        return averageEmission;
       }
       connection.Close();
     }
 
-    // Average the sum of total emission with how many entries retrieved
-    double average = totalEmission / numEntries;
-
-    return new EmissionStatistic
-    {
-      Statistic = "Average Emission",
-      Topic = "Within 1 Week",
-      Stat = average.ToString("0.00")
-    };
-  }
-
-  public EmissionStatistic GetEmissionDifferenceByUserID(int userID)
-  {
-    return new EmissionStatistic
-    {
-      Statistic = "Emission Difference",
-      Topic = "Between 2 Weeks",
-      Stat = null
-    };
+    averageEmission = totalEmission / numEntries;
+    return averageEmission;
   }
 }
