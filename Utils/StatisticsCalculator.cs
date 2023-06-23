@@ -9,6 +9,25 @@ internal class StatisticsCalculator
   public List<EmissionStatistic> GetUserEmissionStatistics(int userID)
   {
     List<EmissionStatistic> statistics = new();
+    try
+    {
+      EmissionStatistic highestEmissionActivity = GetHighestEmissionActivityByUserID(userID);
+      if (highestEmissionActivity != null) {
+        statistics.Add(highestEmissionActivity);
+      }
+
+      EmissionStatistic averageEmission = GetAverageEmissionByUserID(userID);
+      if (averageEmission != null) {
+        statistics.Add(averageEmission);
+      }
+
+      EmissionStatistic averageEmissionDifference = GetEmissionDifferenceByUserID(userID);
+      if (averageEmissionDifference != null) {
+        statistics.Add(averageEmissionDifference);
+      }
+    } catch (Exception ex) {
+      Console.WriteLine(ex.Message);
+    }
     return statistics;
   }
 
