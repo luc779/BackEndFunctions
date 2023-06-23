@@ -115,11 +115,18 @@ internal class StatisticsCalculator
     {
       return null;
     }
+
+    double difference = currentAverageEmission - previousWeekAverageEmission;
+    string stat = difference.ToString("0.00");
+    if (difference >= 0)
+    {
+      stat = "+" + difference.ToString("0.00");
+    }
     return new EmissionStatistic
     {
       Statistic = "Emission Difference",
       Topic = "Between 2 Weeks",
-      Stat = null
+      Stat = stat
     };
   }
 
