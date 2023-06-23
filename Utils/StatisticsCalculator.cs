@@ -38,7 +38,7 @@ internal class StatisticsCalculator
 
     Dictionary<string, double> emissionsDict = new();
     emissionsDict.Add("transport", 0);
-    emissionsDict.Add("foods", 0);
+    emissionsDict.Add("food", 0);
     emissionsDict.Add("utility", 0);
 
     // Retrieve emission per activity type from database
@@ -81,7 +81,7 @@ internal class StatisticsCalculator
     // Calculate percentage
     double sum = emissionsDict.Values.Sum();
     emissionsDict["transport"] = emissionsDict["transport"] / sum;
-    emissionsDict["foods"] = emissionsDict["foods"] / sum;
+    emissionsDict["food"] = emissionsDict["food"] / sum;
     emissionsDict["utility"] = emissionsDict["utility"] / sum;
 
     // Determine the highest emission activity
