@@ -42,9 +42,7 @@ internal class StatisticsCalculator
     emissionsDict.Add("utility", 0);
 
     // Retrieve emission per activity type from database
-    MySqlConnection connection = DatabaseConnecter.MySQLDatabase();
-
-    using (connection)
+    using (MySqlConnection connection = DatabaseConnecter.MySQLDatabase())
     {
       connection.Open();
 
@@ -154,10 +152,8 @@ internal class StatisticsCalculator
     double totalEmission = 0;
     int numEntries = 0;
     double averageEmission = -1;
-    // Retrieve DailyEmission.TotalEmission with a week
-    MySqlConnection connection = DatabaseConnecter.MySQLDatabase();
-
-    using (connection)
+    // Retrieve DailyEmission.TotalEmission between two dates
+    using (MySqlConnection connection = DatabaseConnecter.MySQLDatabase())
     {
       connection.Open();
 
