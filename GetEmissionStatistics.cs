@@ -18,7 +18,7 @@ namespace NoCO2.Function
 
     [Function("GetEmissionStatistics")]
     public async Task<HttpResponseData> GetEmissionStatisticsWithUserKey(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "create-user")] HttpRequestData req)
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "get-emission-statistics")] HttpRequestData req)
     {
       var responseBodyObject = new {
         reply = "InternalError"
