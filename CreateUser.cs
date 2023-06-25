@@ -24,7 +24,7 @@ namespace NoCO2.Function
       };
       try
       {
-        req.Body.TryParseJson<CreateUserBody>(out var requestBody);
+        req.Body.TryParseJson<GeneralUserKeyBody>(out var requestBody);
 
         // Get "UserKey" parameter from HTTP request as either parameter or post value
         string userKey = requestBody?.UserKey;
