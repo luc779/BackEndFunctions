@@ -4,7 +4,7 @@ using Xunit;
 using NoCO2.Test.Util;
 using HttpRequestDataFactory;
 
-namespace NoCO2.Test
+namespace UtilsTest
 {
   public class HttpResponseDataFactoryTests
   {

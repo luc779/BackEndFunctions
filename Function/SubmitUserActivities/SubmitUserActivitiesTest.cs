@@ -4,7 +4,7 @@ using NoCO2.Test.Util;
 using SubmitUserActivitiesFunction;
 using Xunit;
 
-namespace BackEndFunctions
+namespace FunctionsTest
 {
     public class SubmitUserActivitiesTest : IClassFixture<SubmitUserActivities>
     {

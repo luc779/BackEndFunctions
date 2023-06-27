@@ -2,7 +2,7 @@ using HttpRequestDataExtensions;
 using UserKeyBody;
 using Xunit;
 
-namespace NoCO2.Test
+namespace UtilsTest
 {
   public class HttpRequestDataExtensionsTest
   {

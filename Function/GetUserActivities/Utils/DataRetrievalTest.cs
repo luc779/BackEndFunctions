@@ -1,7 +1,7 @@
 using GetUserActivitiesUtil;
 using Xunit;
 
-namespace BackEndFucntions
+namespace FunctionsTest.Util
 {
     public class DataRetrievalTest : IClassFixture<DataRetrieval>
     {

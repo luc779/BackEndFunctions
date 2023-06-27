@@ -8,7 +8,7 @@ using HttpRequestDataFactory;
 using UserKeyBody;
 using UserFinder;
 
-namespace NoCO2.Function
+namespace GetEmissionStatisticsFunction
 {
   public class GetEmissionStatistics
   {

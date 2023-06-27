@@ -1,7 +1,7 @@
 using SubmitUserActivitiesUtil;
 using Xunit;
 
-namespace BackEndFunctions
+namespace FunctionsTest.Util
 {
     public class EmissionCalculatorTest
     {

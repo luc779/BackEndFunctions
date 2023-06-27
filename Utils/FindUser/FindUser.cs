@@ -1,4 +1,4 @@
-using DatabaseConnection;
+using DatabaseConnector;
 using MySqlConnector;
 
 namespace UserFinder

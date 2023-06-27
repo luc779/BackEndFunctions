@@ -1,7 +1,7 @@
 using Xunit;
 using GetEmissionStatisticsUtil;
 
-namespace NoCO2.Test
+namespace FunctionsTest.Util
 {
   public class StatisticsCalculatorTest
   {

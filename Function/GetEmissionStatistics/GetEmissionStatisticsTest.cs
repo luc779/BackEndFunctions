@@ -1,10 +1,10 @@
 using System.Net;
 using Xunit;
-using NoCO2.Function;
-using NoCO2.Test.Util;
 using Newtonsoft.Json;
+using NoCO2.Test.Util;
+using GetEmissionStatisticsFunction;
 
-namespace NoCO2.Test
+namespace FunctionsTest
 {
   public class GetEmissionStatisticsTest : IClassFixture<GetEmissionStatistics>
   {

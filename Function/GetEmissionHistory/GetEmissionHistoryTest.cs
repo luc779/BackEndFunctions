@@ -4,7 +4,7 @@ using NoCO2.Test.Util;
 using Newtonsoft.Json;
 using GetEmissionHistoryFunction;
 
-namespace NoCO2.Test
+namespace FunctionsTest
 {
   public class GetEmissionHistoryTest : IClassFixture<GetEmissionHistory>
   {

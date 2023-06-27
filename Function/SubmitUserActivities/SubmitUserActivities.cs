@@ -1,6 +1,4 @@
 using System.Net;
-using BackEndFunctions;
-using DatabaseConnector;
 using FirebaseAdmin.Auth;
 using HttpRequestDataExtensions;
 using HttpRequestDataFactory;

@@ -4,7 +4,7 @@ using NoCO2.Test.Util;
 using Newtonsoft.Json;
 using CreateUserFunction;
 
-namespace NoCO2.Test
+namespace FunctionsTest
 {
   public class CreateUserTest : IClassFixture<CreateUser>
   {
