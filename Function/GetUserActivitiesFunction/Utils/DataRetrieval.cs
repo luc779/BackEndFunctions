@@ -1,11 +1,11 @@
 using Company.Function;
 using MySqlConnector;
 
-namespace BackEndFucntions
+namespace GetUserActivitiesUtil
 {
-    public class DataRetrieval
+    public static class DataRetrieval
     {
-        public List<dynamic> RetrieveCertainType(int userID, DateTime today, string ACTIVITY_TYPE)
+        public static List<dynamic> RetrieveCertainType(int userID, DateTime today, string ACTIVITY_TYPE)
         {
             List<dynamic> Activity = null;
             string QUERY = "SELECT e.Method, e.Amount FROM Activites AS e "+

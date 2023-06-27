@@ -1,6 +1,7 @@
 using System.Net;
 using BackEndFunctions;
 using FirebaseAdmin.Auth;
+using GetUserActivitiesUtil;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using NoCO2.Function;
@@ -91,10 +92,9 @@ namespace Company.Function
             const string UTILITY = "utility";
 
             // use data retrieval class to retrieve specfic type data
-            DataRetrieval retrieveData = new();
-            List<dynamic> Transports = retrieveData.RetrieveCertainType(userID, today, TRANSPORT);
-            List<dynamic> Foods = retrieveData.RetrieveCertainType(userID, today, FOOD);
-            List<dynamic> Utilities = retrieveData.RetrieveCertainType(userID, today, UTILITY);
+            List<dynamic> Transports = DataRetrieval.RetrieveCertainType(userID, today, TRANSPORT);
+            List<dynamic> Foods      = DataRetrieval.RetrieveCertainType(userID, today, FOOD);
+            List<dynamic> Utilities  = DataRetrieval.RetrieveCertainType(userID, today, UTILITY);
             return new ReturnedInfo(Transports, Foods, Utilities);
         }
     }
