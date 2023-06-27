@@ -6,6 +6,8 @@ using MySqlConnector;
 using NoCO2.Util;
 using Company.Function;
 using BackEndFunctions;
+using GetEmissionHistoryUtils;
+using BackEndFucntions.Function.GetEmissionHistoryFunction.Utils;
 
 namespace NoCO2.Function
 {
@@ -15,8 +17,6 @@ namespace NoCO2.Function
     {
       FirebaseInitializer.Initialize();
     }
-
-    private const double EMISSION_GOAL = 7.36;
 
     [Function("GetEmissionHistory")]
     public async Task<HttpResponseData> GetEmissionHistoryWithUserKey(
@@ -65,7 +65,6 @@ namespace NoCO2.Function
       }
       throw new NotImplementedException();
     }
-
     private static async Task<List<DailyEmission>> GetDailyEmissionsForUserWithinOneYear(int userId)
     {
       DateTime currentDate = DateTime.UtcNow;
@@ -113,11 +112,11 @@ namespace NoCO2.Function
               .Select(offset => oneYearAgo.AddDays(offset).Date)
               .ToList();
 
-          List<DateTime> existingDates = emissions.ConvertAll(new Converter<DailyEmission, DateTime>(ConvertToDateTime));
+          List<DateTime> existingDates = emissions.ConvertAll(new Converter<DailyEmission, DateTime>(ConvertToDateTime.Convert));
 
           List<DateTime> missingDates = allDates.Except(existingDates).ToList();
 
-          emissions.AddRange(missingDates.ConvertAll(new Converter<DateTime, DailyEmission>(ConvertToEmptyEmission)));
+          emissions.AddRange(missingDates.ConvertAll(new Converter<DateTime, DailyEmission>(ConvertToEmptyEmission.Convert)));
           connection.Close();
           return emissions.OrderBy(e => e.DateTime).ToList();
         }
@@ -125,18 +124,6 @@ namespace NoCO2.Function
         connection.Close();
         return emissions;
       }
-    }
-    public static DateTime ConvertToDateTime(DailyEmission e)
-    {
-      return e.DateTime;
-    }
-    public static DailyEmission ConvertToEmptyEmission(DateTime date) {
-      return new DailyEmission
-        {
-          DateTime = date,
-          Total = null,
-          Goal = EMISSION_GOAL
-        };
     }
   }
 }
