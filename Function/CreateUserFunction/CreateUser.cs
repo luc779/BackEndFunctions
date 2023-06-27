@@ -5,6 +5,7 @@ using FirebaseAdmin.Auth;
 using MySqlConnector;
 using NoCO2.Util;
 using Company.Function;
+using UserKeyUtils;
 
 namespace NoCO2.Function
 {
@@ -63,65 +64,32 @@ namespace NoCO2.Function
 
     // TODO: Move all Database related tasks into one class
     private static bool AddUserToDatabase(string originalUserKey, string hashedUserKey) {
-
       MySqlConnection connection = DatabaseConnecter.MySQLDatabase();
+      using(connection)
+      connection.Open();
 
-      using (connection)
+      // Start the transaction
+      using MySqlTransaction transaction = connection.BeginTransaction();
+      try
       {
-        connection.Open();
-
-        // Start the transaction
-        using (MySqlTransaction transaction = connection.BeginTransaction())
-        {
-          try
+          // Selet UserKey from Users where UserKey is equal to hashedUserKey
+          bool NotInsert = SelectUserKey.Select(connection, transaction, originalUserKey);
+          if(NotInsert)
           {
-            // Selet UserKey from Users where UserKey is equal to hashedUserKey
-            using (MySqlCommand command = connection.CreateCommand())
-            {
-              const string query = "SELECT UserKey FROM Users";
-              command.Transaction = transaction;
-              command.CommandText = query;
-              using MySqlDataReader reader = command.ExecuteReader();
-              if (reader.HasRows) {
-                while (reader.Read())
-                {
-                  string hashedUserKeyInDB = reader.GetString(0);
-                  if (BCrypt.Net.BCrypt.Verify(originalUserKey, hashedUserKeyInDB)) {
-                    connection.Close();
-                    return true;
-                  }
-                }
-              }
-            }
-
-            // Insert a user to Users table with the hashedUserKey
-            using (MySqlCommand command = connection.CreateCommand())
-            {
-              const string userKey = "@userKey";
-              const string query = "INSERT INTO Users (UserKey) Values ("+ userKey +")";
-              command.CommandText = query;
-              command.Transaction = transaction;
-              command.Parameters.AddWithValue(userKey, hashedUserKey);
-              command.ExecuteNonQuery();
-            }
-
-            // Commit the transaction
-            transaction.Commit();
-
-            // Transaction completed successfully
-            connection.Close();
             return true;
           }
-          catch (Exception)
-          {
-            // An error occurred, rollback the transaction
-            transaction.Rollback();
 
-            // Handle the exception
-            connection.Close();
-            return false;
-          }
-        }
+          // Insert a user to Users table with the hashedUserKey
+          return InsertUserKey.Insert(connection, transaction, hashedUserKey);
+      }
+      catch (Exception)
+      {
+          // An error occurred, rollback the transaction
+          transaction.Rollback();
+
+          // Handle the exception
+          connection.Close();
+          return false;
       }
     }
   }

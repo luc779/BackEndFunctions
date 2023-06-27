@@ -83,7 +83,6 @@ namespace NoCO2.Function
                "WHERE u.ID = @userId AND e.DateTime >= '@oneYearAgo' AND e.DateTime <= '@currentDate'" +
                " ORDER BY e.DateTime ASC";
 
-
         using MySqlCommand command = connection.CreateCommand();
         command.CommandText = query;
         command.Parameters.AddWithValue("@userId", userId);
@@ -127,12 +126,10 @@ namespace NoCO2.Function
         return emissions;
       }
     }
-
     public static DateTime ConvertToDateTime(DailyEmission e)
     {
       return e.DateTime;
     }
-
     public static DailyEmission ConvertToEmptyEmission(DateTime date) {
       return new DailyEmission
         {

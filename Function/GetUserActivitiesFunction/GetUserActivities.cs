@@ -1,10 +1,8 @@
 using System.Net;
-using BackEndFucntions;
 using BackEndFunctions;
 using FirebaseAdmin.Auth;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
-using MySqlConnector;
 using NoCO2.Function;
 using NoCO2.Util;
 
@@ -85,7 +83,6 @@ namespace Company.Function
             }
             throw new NotImplementedException();
         }
-
         private static ReturnedInfo RetrieveAllUserActivities(int userID)
         {
             DateTime today = DateTime.UtcNow;

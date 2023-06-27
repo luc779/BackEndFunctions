@@ -1,5 +1,4 @@
 using System.Net;
-using Company;
 using Newtonsoft.Json;
 using NoCO2.Test.Util;
 using Xunit;
