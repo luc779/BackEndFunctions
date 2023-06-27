@@ -2,9 +2,7 @@ using System.Net;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using FirebaseAdmin.Auth;
-using MySqlConnector;
 using NoCO2.Util;
-using Company.Function;
 using BackEndFunctions;
 using GetEmissionStatisticUtil;
 
