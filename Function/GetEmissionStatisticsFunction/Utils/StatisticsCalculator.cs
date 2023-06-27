@@ -1,5 +1,6 @@
 using MySqlConnector;
 using Company.Function;
+using GetEmissionStatisticUtil;
 
 namespace NoCO2.Util;
 
@@ -31,7 +32,7 @@ internal class StatisticsCalculator
     return statistics;
   }
 
-  public EmissionStatistic GetHighestEmissionActivityByUserID(int userID)
+  public static EmissionStatistic GetHighestEmissionActivityByUserID(int userID)
   {
     DateTime currentDate = DateTime.UtcNow;
     DateTime oneWeekAgo = currentDate.AddDays(-7);
@@ -78,9 +79,9 @@ internal class StatisticsCalculator
 
     // Calculate percentage
     double sum = emissionsDict.Values.Sum();
-    emissionsDict["transport"] = emissionsDict["transport"] / sum;
-    emissionsDict["food"] = emissionsDict["food"] / sum;
-    emissionsDict["utility"] = emissionsDict["utility"] / sum;
+    emissionsDict["transport"] /= sum;
+    emissionsDict["food"] /= sum;
+    emissionsDict["utility"] /= sum;
 
     // Determine the highest emission activity
     KeyValuePair<string, double> highestEmissionActivity = emissionsDict
@@ -94,7 +95,7 @@ internal class StatisticsCalculator
     };
   }
 
-  public EmissionStatistic GetAverageEmissionByUserID(int userID)
+  public static EmissionStatistic GetAverageEmissionByUserID(int userID)
   {
     DateTime currentDate = DateTime.UtcNow;
     DateTime oneWeekAgo = currentDate.AddDays(-7);
@@ -114,7 +115,7 @@ internal class StatisticsCalculator
     };
   }
 
-  public EmissionStatistic GetEmissionDifferenceByUserID(int userID)
+  public static EmissionStatistic GetEmissionDifferenceByUserID(int userID)
   {
     DateTime currentDate = DateTime.UtcNow;
     DateTime oneWeekAgo = currentDate.AddDays(-7);
@@ -147,7 +148,7 @@ internal class StatisticsCalculator
     };
   }
 
-  public double GetAverageEmissionBetweenTwoDate(DateTime currentDate, DateTime previousDate, int userID)
+  public static double GetAverageEmissionBetweenTwoDate(DateTime currentDate, DateTime previousDate, int userID)
   {
     double totalEmission = 0;
     int numEntries = 0;
@@ -174,7 +175,7 @@ internal class StatisticsCalculator
         {
           double dailyTotalEmission = reader.GetDouble("TotalAmount");
           totalEmission += dailyTotalEmission;
-          numEntries += 1;
+          numEntries++;
         }
       } else {
         connection.Close();
@@ -182,8 +183,6 @@ internal class StatisticsCalculator
       }
       connection.Close();
     }
-
-    averageEmission = totalEmission / numEntries;
-    return averageEmission;
-  }
+    return totalEmission / numEntries;
+    }
 }

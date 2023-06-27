@@ -1,6 +1,9 @@
-public class EmissionStatistic
+namespace GetEmissionStatisticUtil
 {
-    public string Statistic { get; set; }
-    public string Topic { get; set; }
-    public string Stat { get; set; }
+    public class EmissionStatistic
+    {
+        public string Statistic { get; set; }
+        public string Topic { get; set; }
+        public string Stat { get; set; }
+    }
 }

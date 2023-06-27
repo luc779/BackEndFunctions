@@ -6,6 +6,7 @@ using MySqlConnector;
 using NoCO2.Util;
 using Company.Function;
 using BackEndFunctions;
+using GetEmissionStatisticUtil;
 
 namespace NoCO2.Function
 {

@@ -1,5 +1,6 @@
 using Xunit;
 using NoCO2.Util;
+using GetEmissionStatisticUtil;
 
 namespace NoCO2.Test
 {
@@ -11,7 +12,7 @@ namespace NoCO2.Test
       const int USER_ID = 0;
       StatisticsCalculator calculator = new();
 
-      EmissionStatistic statistic = calculator.GetHighestEmissionActivityByUserID(USER_ID);
+      EmissionStatistic statistic = StatisticsCalculator.GetHighestEmissionActivityByUserID(USER_ID);
 
       Assert.NotEmpty(statistic.Statistic);
       Assert.NotEmpty(statistic.Topic);
@@ -24,7 +25,7 @@ namespace NoCO2.Test
       const int USER_ID = 0;
       StatisticsCalculator calculator = new();
 
-      EmissionStatistic statistic = calculator.GetAverageEmissionByUserID(USER_ID);
+      EmissionStatistic statistic = StatisticsCalculator.GetAverageEmissionByUserID(USER_ID);
 
       Assert.NotEmpty(statistic.Statistic);
       Assert.NotEmpty(statistic.Topic);
@@ -37,7 +38,7 @@ namespace NoCO2.Test
       const int USER_ID = 0;
       StatisticsCalculator calculator = new();
 
-      EmissionStatistic statistic = calculator.GetEmissionDifferenceByUserID(USER_ID);
+      EmissionStatistic statistic = StatisticsCalculator.GetEmissionDifferenceByUserID(USER_ID);
 
       Assert.NotEmpty(statistic.Statistic);
       Assert.NotEmpty(statistic.Topic);
