@@ -9,8 +9,8 @@ namespace BackEndFucntions
         {
             List<dynamic> Activity = null;
             string QUERY = "SELECT e.Method, e.Amount FROM Activites AS e "+
-                "JOIN Users As u ON e.UsersID = u.iD"+
-                "' WHERE u.ID = '" + userID + "' AND e.DateTime = '" + today.ToString("yyyy/MM/dd") + "' AND ActivityType = '" + ACTIVITY_TYPE + "'";
+                "JOIN Users As u ON e.UsersID = u.ID"+
+                " WHERE u.ID = '" + userID + "' AND e.DateTime = '" + today.ToString("yyyy/MM/dd") + "' AND e.ActivityType = '" + ACTIVITY_TYPE + "'";
 
             using MySqlConnection connetion = DatabaseConnecter.MySQLDatabase();
             connetion.Open();
