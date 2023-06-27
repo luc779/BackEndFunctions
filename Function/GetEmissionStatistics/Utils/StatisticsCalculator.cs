@@ -1,5 +1,5 @@
+using DatabaseConnector;
 using MySqlConnector;
-using Company.Function;
 
 namespace GetEmissionStatisticsUtil;
 

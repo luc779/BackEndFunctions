@@ -1,6 +1,6 @@
 using MySqlConnector;
 
-namespace DatabaseConnection;
+namespace DatabaseConnector;
 
 public static class DatabaseConnecter
 {

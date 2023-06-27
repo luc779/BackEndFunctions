@@ -1,4 +1,4 @@
-using Company.Function;
+using DatabaseConnector;
 using MySqlConnector;
 
 namespace GetUserActivitiesUtil

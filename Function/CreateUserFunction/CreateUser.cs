@@ -1,24 +1,24 @@
 using System.Net;
-using FirebaseAdmin.Auth;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
-using NoCO2.Util;
-using BackEndFunctions;
-using GetEmissionHistoryUtils;
-using NoCO2.Function;
+using FirebaseAdmin.Auth;
+using CreateUserUtils;
+using UserKeyBody;
+using HttpRequestDataExtensions;
+using HttpRequestDataFactory;
 
-namespace GetEmissionHistoryFunction
+namespace CreateUserFunction
 {
-  public class GetEmissionHistory
+  public class CreateUser
   {
-    static GetEmissionHistory()
+    static CreateUser()
     {
-      FirebaseInitializer.Initialize();
+        FirebaseInitializer.Initialize();
     }
 
-    [Function("GetEmissionHistory")]
-    public async Task<HttpResponseData> GetEmissionHistoryWithUserKey(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "get-emission-history")] HttpRequestData req)
+    [Function("CreateUser")]
+    public async Task<HttpResponseData> CreateUserWithUserKey(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "create-user")] HttpRequestData req)
     {
       var responseBodyObject = new {
         reply = "InternalError"
@@ -29,25 +29,23 @@ namespace GetEmissionHistoryFunction
 
         // Get "UserKey" parameter from HTTP request as either parameter or post value
         string userKey = requestBody?.UserKey;
-        UserRecord userRecord = await FirebaseAuth.DefaultInstance.GetUserAsync(userKey);
-        int matchedUserID = FindUser.UserFinder(userKey);
 
-        if (matchedUserID == -1)
-        {
-          // There is no user that has a matching hashed userkey from input userkey
+        UserRecord userRecord = await FirebaseAuth.DefaultInstance.GetUserAsync(userKey);
+
+        // Hash the userKey
+        string hashedUserKey = BCrypt.Net.BCrypt.HashPassword(userKey);
+
+        // Check if the database has a user with the same hashedUserKey
+        bool isUserAdded = AddUser.Add(userKey, hashedUserKey);
+        if (isUserAdded) {
           responseBodyObject = new {
-            reply = "UserNotFound"
+            reply = "Success"
           };
-          return await HttpResponseDataFactory.GetHttpResponseData(req, HttpStatusCode.BadRequest, responseBodyObject);
+          return await HttpResponseDataFactory.GetHttpResponseData(req, HttpStatusCode.OK, responseBodyObject);
         }
 
-        // Format the list of emissions into an object for HttpResponseData
-        List<DailyEmission> emissionHistory = await UserOneYearDailyEmissions.GetEmissions(matchedUserID);
-        var successResponseBodyObject = new {
-            reply = "Success",
-            History = emissionHistory
-        };
-        return await HttpResponseDataFactory.GetHttpResponseData(req, HttpStatusCode.OK, successResponseBodyObject);
+        // For some reason, the userkey is not added to the database
+        return await HttpResponseDataFactory.GetHttpResponseData(req, HttpStatusCode.InternalServerError, responseBodyObject);
       } catch (ArgumentException) {
         responseBodyObject = new {
           reply = "InvalidArgument"

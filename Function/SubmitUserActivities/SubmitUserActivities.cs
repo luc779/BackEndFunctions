@@ -1,12 +1,14 @@
 using System.Net;
 using BackEndFunctions;
-using Company.Function;
+using DatabaseConnector;
 using FirebaseAdmin.Auth;
+using HttpRequestDataExtensions;
+using HttpRequestDataFactory;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using MySqlConnector;
-using NoCO2.Util;
 using SubmitUserActivitiesUtil;
+using UserFinder;
 
 namespace SubmitUserActivitiesFunction
 {

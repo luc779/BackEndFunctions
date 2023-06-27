@@ -2,22 +2,24 @@ using System.Net;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using FirebaseAdmin.Auth;
-using NoCO2.Util;
-using CreateUserUtils;
-using NoCO2.Function;
+using GetEmissionStatisticsUtil;
+using HttpRequestDataExtensions;
+using HttpRequestDataFactory;
+using UserKeyBody;
+using UserFinder;
 
-namespace CreateUserFunction
+namespace NoCO2.Function
 {
-  public class CreateUser
+  public class GetEmissionStatistics
   {
-    static CreateUser()
+    static GetEmissionStatistics()
     {
         FirebaseInitializer.Initialize();
     }
 
-    [Function("CreateUser")]
-    public async Task<HttpResponseData> CreateUserWithUserKey(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "create-user")] HttpRequestData req)
+    [Function("GetEmissionStatistics")]
+    public async Task<HttpResponseData> GetEmissionStatisticsWithUserKey(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "get-emission-statistics")] HttpRequestData req)
     {
       var responseBodyObject = new {
         reply = "InternalError"
@@ -28,23 +30,26 @@ namespace CreateUserFunction
 
         // Get "UserKey" parameter from HTTP request as either parameter or post value
         string userKey = requestBody?.UserKey;
-
         UserRecord userRecord = await FirebaseAuth.DefaultInstance.GetUserAsync(userKey);
+        int matchedUserID = FindUser.UserFinder(userKey);
 
-        // Hash the userKey
-        string hashedUserKey = BCrypt.Net.BCrypt.HashPassword(userKey);
-
-        // Check if the database has a user with the same hashedUserKey
-        bool isUserAdded = AddUser.Add(userKey, hashedUserKey);
-        if (isUserAdded) {
+        if (matchedUserID == -1)
+        {
+          // There is no user that has a matching hashed userkey from input userkey
           responseBodyObject = new {
-            reply = "Success"
+            reply = "UserNotFound"
           };
-          return await HttpResponseDataFactory.GetHttpResponseData(req, HttpStatusCode.OK, responseBodyObject);
+          return await HttpResponseDataFactory.GetHttpResponseData(req, HttpStatusCode.BadRequest, responseBodyObject);
         }
 
-        // For some reason, the userkey is not added to the database
-        return await HttpResponseDataFactory.GetHttpResponseData(req, HttpStatusCode.InternalServerError, responseBodyObject);
+        StatisticsCalculator calculator = new();
+        List<EmissionStatistic> statistics = calculator.GetUserEmissionStatistics(matchedUserID);
+        // Format the list of emissions into an object for HttpResponseData
+        var successResponseBodyObject = new {
+            reply = "Success",
+            Statistics = statistics
+        };
+        return await HttpResponseDataFactory.GetHttpResponseData(req, HttpStatusCode.OK, successResponseBodyObject);
       } catch (ArgumentException) {
         responseBodyObject = new {
           reply = "InvalidArgument"

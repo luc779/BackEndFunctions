@@ -1,11 +1,12 @@
 using System.Net;
-using BackEndFunctions;
 using FirebaseAdmin.Auth;
 using GetUserActivitiesUtil;
+using HttpRequestDataExtensions;
+using HttpRequestDataFactory;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
-using NoCO2.Function;
-using NoCO2.Util;
+using UserFinder;
+using UserKeyBody;
 
 namespace GetUserActivitiesFunction
 {

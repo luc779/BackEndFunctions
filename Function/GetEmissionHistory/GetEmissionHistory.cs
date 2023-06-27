@@ -1,23 +1,25 @@
 using System.Net;
+using FirebaseAdmin.Auth;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
-using FirebaseAdmin.Auth;
-using NoCO2.Util;
-using BackEndFunctions;
-using GetEmissionStatisticsUtil;
+using GetEmissionHistoryUtils;
+using HttpRequestDataExtensions;
+using UserKeyBody;
+using HttpRequestDataFactory;
+using UserFinder;
 
-namespace NoCO2.Function
+namespace GetEmissionHistoryFunction
 {
-  public class GetEmissionStatistics
+  public class GetEmissionHistory
   {
-    static GetEmissionStatistics()
+    static GetEmissionHistory()
     {
-        FirebaseInitializer.Initialize();
+      FirebaseInitializer.Initialize();
     }
 
-    [Function("GetEmissionStatistics")]
-    public async Task<HttpResponseData> GetEmissionStatisticsWithUserKey(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "get-emission-statistics")] HttpRequestData req)
+    [Function("GetEmissionHistory")]
+    public async Task<HttpResponseData> GetEmissionHistoryWithUserKey(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "get-emission-history")] HttpRequestData req)
     {
       var responseBodyObject = new {
         reply = "InternalError"
@@ -40,12 +42,11 @@ namespace NoCO2.Function
           return await HttpResponseDataFactory.GetHttpResponseData(req, HttpStatusCode.BadRequest, responseBodyObject);
         }
 
-        StatisticsCalculator calculator = new();
-        List<EmissionStatistic> statistics = calculator.GetUserEmissionStatistics(matchedUserID);
         // Format the list of emissions into an object for HttpResponseData
+        List<DailyEmission> emissionHistory = await UserOneYearDailyEmissions.GetEmissions(matchedUserID);
         var successResponseBodyObject = new {
             reply = "Success",
-            Statistics = statistics
+            History = emissionHistory
         };
         return await HttpResponseDataFactory.GetHttpResponseData(req, HttpStatusCode.OK, successResponseBodyObject);
       } catch (ArgumentException) {
