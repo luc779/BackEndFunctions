@@ -1,8 +1,8 @@
 using System.Net;
 using Microsoft.Azure.Functions.Worker.Http;
 using Xunit;
-using NoCO2.Test.Util;
 using HttpRequestDataFactory;
+using TestUtilities;
 
 namespace UtilsTest
 {
