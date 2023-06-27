@@ -8,7 +8,7 @@ using MySqlConnector;
 using NoCO2.Util;
 using SubmitUserActivitiesUtil;
 
-namespace Company
+namespace SubmitUserActivitiesFunction
 {
     public class SubmitUserActivities
     {

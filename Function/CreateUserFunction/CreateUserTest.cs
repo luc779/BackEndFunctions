@@ -1,8 +1,8 @@
 using System.Net;
 using Xunit;
-using NoCO2.Function;
 using NoCO2.Test.Util;
 using Newtonsoft.Json;
+using CreateUserFunction;
 
 namespace NoCO2.Test
 {

@@ -1,8 +1,7 @@
 using MySqlConnector;
 using Company.Function;
-using GetEmissionStatisticUtil;
 
-namespace NoCO2.Util;
+namespace GetEmissionStatisticsUtil;
 
 internal class StatisticsCalculator
 {

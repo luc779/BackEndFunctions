@@ -1,4 +1,4 @@
-namespace GetEmissionStatisticUtil
+namespace GetEmissionStatisticsUtil
 {
     public class EmissionStatistic
     {

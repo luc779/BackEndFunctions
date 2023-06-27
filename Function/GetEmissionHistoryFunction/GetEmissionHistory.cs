@@ -5,9 +5,9 @@ using Microsoft.Azure.Functions.Worker.Http;
 using NoCO2.Util;
 using BackEndFunctions;
 using GetEmissionHistoryUtils;
-using BackEndFucntions;
+using NoCO2.Function;
 
-namespace NoCO2.Function
+namespace GetEmissionHistoryFunction
 {
   public class GetEmissionHistory
   {

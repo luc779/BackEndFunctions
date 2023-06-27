@@ -4,7 +4,7 @@ using Microsoft.Azure.Functions.Worker.Http;
 using FirebaseAdmin.Auth;
 using NoCO2.Util;
 using BackEndFunctions;
-using GetEmissionStatisticUtil;
+using GetEmissionStatisticsUtil;
 
 namespace NoCO2.Function
 {

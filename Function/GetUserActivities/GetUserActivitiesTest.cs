@@ -1,5 +1,5 @@
 using System.Net;
-using Company.Function;
+using GetUserActivitiesFunction;
 using Newtonsoft.Json;
 using NoCO2.Test.Util;
 using Xunit;

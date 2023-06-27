@@ -1,8 +1,7 @@
 using Company.Function;
-using GetEmissionHistoryUtils;
 using MySqlConnector;
 
-namespace BackEndFucntions
+namespace GetEmissionHistoryUtils
 {
     public static class UserOneYearDailyEmissions
     {

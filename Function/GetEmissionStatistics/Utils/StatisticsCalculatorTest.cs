@@ -1,6 +1,5 @@
 using Xunit;
-using NoCO2.Util;
-using GetEmissionStatisticUtil;
+using GetEmissionStatisticsUtil;
 
 namespace NoCO2.Test
 {

@@ -7,7 +7,7 @@ using Microsoft.Azure.Functions.Worker.Http;
 using NoCO2.Function;
 using NoCO2.Util;
 
-namespace Company.Function
+namespace GetUserActivitiesFunction
 {
     public class GetUserActivities
     {

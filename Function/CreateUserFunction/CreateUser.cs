@@ -4,8 +4,9 @@ using Microsoft.Azure.Functions.Worker.Http;
 using FirebaseAdmin.Auth;
 using NoCO2.Util;
 using CreateUserUtils;
+using NoCO2.Function;
 
-namespace NoCO2.Function
+namespace CreateUserFunction
 {
   public class CreateUser
   {

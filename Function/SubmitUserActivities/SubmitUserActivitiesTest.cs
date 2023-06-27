@@ -1,6 +1,7 @@
 using System.Net;
 using Newtonsoft.Json;
 using NoCO2.Test.Util;
+using SubmitUserActivitiesFunction;
 using Xunit;
 
 namespace BackEndFunctions
