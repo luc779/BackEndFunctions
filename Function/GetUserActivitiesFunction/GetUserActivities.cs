@@ -11,18 +11,6 @@ namespace Company.Function
 {
     public class GetUserActivities
     {
-        class ReturnedInfo
-        {
-            public List<dynamic> Transports { get; }
-            public List<dynamic> Foods { get; }
-            public List<dynamic> Utilities { get; }
-            public ReturnedInfo(List<dynamic> transports, List<dynamic> foods, List<dynamic> utilities)
-            {
-                Transports = transports;
-                Foods = foods;
-                Utilities = utilities;
-            }
-        }
         public GetUserActivities()
         {
             FirebaseInitializer.Initialize();
@@ -54,7 +42,9 @@ namespace Company.Function
                         };
                         return await HttpResponseDataFactory.GetHttpResponseData(req, HttpStatusCode.BadRequest, responseBodyObject);
                     }
-                    ReturnedInfo information = RetrieveAllUserActivities(matchedUserID);
+
+                    // retrieve all activities
+                    ReturnedInfo information = AllActivityRetrieval.Retrieve(matchedUserID);
                     var successresponseBodyObject = new {
                         reply = "Success",
                         Transports = information.Transports,
@@ -83,20 +73,6 @@ namespace Company.Function
                 return await HttpResponseDataFactory.GetHttpResponseData(req, HttpStatusCode.InternalServerError, responseBodyObject);
             }
             throw new NotImplementedException();
-        }
-        private static ReturnedInfo RetrieveAllUserActivities(int userID)
-        {
-            DateTime today = DateTime.UtcNow;
-            const string TRANSPORT = "transport";
-            const string FOOD = "food";
-            const string UTILITY = "utility";
-
-            // use data retrieval class to retrieve specfic type data
-            DataRetrieval retrieveData = new();
-            List<dynamic> Transports = retrieveData.RetrieveCertainType(userID, today, TRANSPORT);
-            List<dynamic> Foods = retrieveData.RetrieveCertainType(userID, today, FOOD);
-            List<dynamic> Utilities = retrieveData.RetrieveCertainType(userID, today, UTILITY);
-            return new ReturnedInfo(Transports, Foods, Utilities);
         }
     }
 }
