@@ -74,7 +74,6 @@ internal class StatisticsCalculator
         connection.Close();
         return null;
       }
-      connection.Close();
     }
 
     // Calculate percentage
