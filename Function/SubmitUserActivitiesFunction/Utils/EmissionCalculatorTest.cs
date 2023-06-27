@@ -1,4 +1,4 @@
-using Company.Function;
+using SubmitUserActivitiesUtil;
 using Xunit;
 
 namespace BackEndFunctions

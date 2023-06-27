@@ -5,9 +5,8 @@ using FirebaseAdmin.Auth;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using MySqlConnector;
-using Newtonsoft.Json;
-using NoCO2.Function;
 using NoCO2.Util;
+using SubmitUserActivitiesUtil;
 
 namespace Company
 {
@@ -111,9 +110,16 @@ namespace Company
 
                     // input new entries using same query
                     const string QUERY = "INSERT INTO Activities (UserID, ActivityType, Method, Amount, DateTime, Emission) Values (@UserID, @ActivityType, @Method, @Amount, @DateTime, @Emission)";
-                    InputTransport(userID, transports, connection, date, QUERY);
-                    InputFood(userID, foods, connection, date, QUERY);
-                    InputUtilities(userID, utilities, connection, date, QUERY);
+                    const string transport = "transport";
+                    const string food = "food";
+                    const string utility = "utility";
+
+                    // input transport
+                    InputActivity.Input(userID, transports, connection, date, QUERY, transport);
+                    // input food
+                    InputActivity.Input(userID, transports, connection, date, QUERY, food);
+                    // input utility
+                    InputActivity.Input(userID, transports, connection, date, QUERY, utility);
 
                     // update Daily emissions
                     DailyEmissionsHelper(userID, connection, date);
@@ -146,128 +152,6 @@ namespace Company
             catch (Exception) {
                 command.Transaction.Rollback();
                 throw new Exception();
-            }
-        }
-        private static void InputTransport(int userID, List<dynamic> transports, MySqlConnection connection, DateTime todaysDate, string QUERY) {
-            // new command
-            using MySqlCommand command = new(QUERY, connection);
-            // start a transaction
-            command.Transaction = connection.BeginTransaction();
-
-            // varaibles that dont change for each unique transport
-            const string ACTIVITY_TYPE = "transport";
-            EmissionCalculator calculations = new();
-
-            try
-            {
-            // add each entry in the table
-            foreach (var transport in transports)
-            {
-                // transportation type
-                string method = transport.Type;
-                // amount of miles driven
-                double amount = transport.Amount;
-
-                // calculate emissions with, method (transportation type), and amount (miles driven)
-                double emission = calculations.DrivingCalculation(method, amount);
-
-                // insert info in Activities Table
-                command.CommandText = QUERY;
-                command.Parameters.AddWithValue("@UserID", userID);
-                command.Parameters.AddWithValue("@ActivityType", ACTIVITY_TYPE);
-                command.Parameters.AddWithValue("@Method", method);
-                command.Parameters.AddWithValue("@Amount", amount);
-                command.Parameters.AddWithValue("@DateTime", todaysDate);
-                command.Parameters.AddWithValue("@Emission", emission);
-                command.ExecuteNonQuery();
-            }
-            // commit transction
-            command.Transaction.Commit();
-            }
-            catch (Exception) {
-                command.Transaction.Rollback();
-                throw new Exception(); // makes SubmitActivities rollback
-            }
-        }
-        private  static void InputFood(int userID, List<dynamic> foods, MySqlConnection connection, DateTime todaysDate, string QUERY) {
-            // new command
-            using MySqlCommand command = new(QUERY, connection);
-            // start transaction
-            command.Transaction = connection.BeginTransaction();
-            // varaibles that dont change for each unique foods
-            const string ACTIVITY_TYPE = "food";
-            EmissionCalculator calculations = new();
-
-            try
-            {
-            // add each food in foods
-            foreach (var food in foods)
-            {
-                // food type eaten
-                string method = food.Type;
-                // amount of food eaten
-                double amount = food.Amount;
-
-                // calculate emissions, method (foodType), amount (servings or grams)
-                double emission = calculations.FoodCalculation(method, amount);
-
-                // insert info in Activities Table
-                command.CommandText = QUERY;
-                command.Parameters.AddWithValue("@UserID", userID);
-                command.Parameters.AddWithValue("@ActivityType", ACTIVITY_TYPE);
-                command.Parameters.AddWithValue("@Method", method);
-                command.Parameters.AddWithValue("@Amount", amount);
-                command.Parameters.AddWithValue("@DateTime", todaysDate);
-                command.Parameters.AddWithValue("@Emission", emission);
-                command.ExecuteNonQuery();
-            }
-            // commit transaction
-            command.Transaction.Commit();
-            }
-            catch (Exception) {
-                command.Transaction.Rollback();
-                throw new Exception(); // makes SubmitActivities rollback
-            }
-        }
-        private static void InputUtilities(int userID, List<dynamic> utilities, MySqlConnection connection, DateTime todaysDate, string QUERY) {
-            // new command
-            using MySqlCommand command = new(QUERY, connection);
-            // start a transaction
-            command.Transaction = connection.BeginTransaction();
-            // varaibles that dont change for each unique foods
-            const string ACTIVITY_TYPE = "utility";
-            EmissionCalculator calculations = new();
-            try
-            {
-                foreach (var utility in utilities)
-                {
-                    // get the utility type
-                    string method = utility.Type;
-                    // get hours used
-                    double amount = utility.Amount;
-                    // calculate the utilities emission
-                    double emission = calculations.UtilitiesCalculation(method, amount);
-                    if (emission == -1)
-                    {
-                        break;
-                    }
-
-                    // insert info in Activities Table
-                    command.CommandText = QUERY;
-                    command.Parameters.AddWithValue("@UserID", userID);
-                    command.Parameters.AddWithValue("@ActivityType", ACTIVITY_TYPE);
-                    command.Parameters.AddWithValue("@Method", method);
-                    command.Parameters.AddWithValue("@Amount", amount);
-                    command.Parameters.AddWithValue("@DateTime", todaysDate);
-                    command.Parameters.AddWithValue("@Emission", emission);
-                    command.ExecuteNonQuery();
-                }
-            // commit transaction
-            command.Transaction.Commit();
-            }
-            catch (Exception) {
-                command.Transaction.Rollback();
-                throw new Exception(); // makes SubmitActivities rollback
             }
         }
         private static void DailyEmissionsHelper(int userID, MySqlConnection connection, DateTime todaysDate)
