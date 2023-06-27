@@ -1,13 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
-using Microsoft.Extensions.Primitives;
-using Microsoft.Azure.Functions.Worker.Http;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Microsoft.Azure.Functions.Worker.Http;
 
-namespace NoCO2.Test.Util
+namespace TestUtilities
 {
   public static class TestFactory
   {

@@ -1,7 +1,7 @@
 using System.Net;
 using GetUserActivitiesFunction;
 using Newtonsoft.Json;
-using NoCO2.Test.Util;
+using TestUtilities;
 using Xunit;
 
 namespace FunctionsTest

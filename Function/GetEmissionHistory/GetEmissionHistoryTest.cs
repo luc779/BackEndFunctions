@@ -1,8 +1,8 @@
 using System.Net;
 using Xunit;
-using NoCO2.Test.Util;
 using Newtonsoft.Json;
 using GetEmissionHistoryFunction;
+using TestUtilities;
 
 namespace FunctionsTest
 {
