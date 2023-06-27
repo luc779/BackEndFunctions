@@ -1,3 +1,4 @@
+using SubmitUserActivitiesUtil;
 using Xunit;
 
 namespace BackEndFunctions.Tests.UtilsTests

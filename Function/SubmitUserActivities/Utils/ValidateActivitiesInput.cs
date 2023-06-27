@@ -1,4 +1,4 @@
-namespace BackEndFunctions
+namespace SubmitUserActivitiesUtil
 {
     public static class ValidateActivitiesInput
     {
