@@ -2,7 +2,7 @@ using System.Net;
 using Microsoft.Azure.Functions.Worker.Http;
 using Xunit;
 using NoCO2.Test.Util;
-using NoCO2.Util;
+using HttpRequestDataFactory;
 
 namespace NoCO2.Test
 {

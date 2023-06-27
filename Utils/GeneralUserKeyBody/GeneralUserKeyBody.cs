@@ -1,4 +1,4 @@
-namespace NoCO2.Function;
+namespace UserKeyBody;
 
 public class GeneralUserKeyBody
 {

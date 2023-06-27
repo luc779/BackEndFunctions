@@ -1,3 +1,4 @@
+using UserFinder;
 using Xunit;
 
 namespace BackEndFunctions.Tests.UtilsTests
