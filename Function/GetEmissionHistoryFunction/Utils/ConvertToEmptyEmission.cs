@@ -1,6 +1,4 @@
-using GetEmissionHistoryUtils;
-
-namespace BackEndFucntions.Function.GetEmissionHistoryFunction.Utils
+namespace GetEmissionHistoryUtils
 {
     public static class ConvertToEmptyEmission
     {
