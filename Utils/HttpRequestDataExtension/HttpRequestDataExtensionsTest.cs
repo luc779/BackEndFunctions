@@ -16,7 +16,7 @@ namespace NoCO2.Test
       var stream = GenerateStreamFromString(json);
 
       // Act
-      stream.TryParseJson<CreateUserBody>(out var result);
+      stream.TryParseJson<GeneralUserKeyBody>(out var result);
 
       // Assert
       Assert.Equal("pGIWAl55j3XH4LFHbXgsdtoM46j2", result.UserKey);
@@ -32,7 +32,7 @@ namespace NoCO2.Test
       var stream = GenerateStreamFromString(json);
 
       // Act & Assert
-      Assert.Throws<ArgumentException>(() => stream.TryParseJson<CreateUserBody>(out _));
+      Assert.Throws<ArgumentException>(() => stream.TryParseJson<GeneralUserKeyBody>(out _));
     }
 
     // Helper method to convert a string to a stream
