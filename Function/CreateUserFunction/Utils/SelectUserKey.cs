@@ -1,6 +1,6 @@
 using MySqlConnector;
 
-namespace UserKeyUtils
+namespace CreateUserUtils
 {
     public static class SelectUserKey
     {

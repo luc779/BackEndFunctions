@@ -2,10 +2,8 @@ using System.Net;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using FirebaseAdmin.Auth;
-using MySqlConnector;
 using NoCO2.Util;
-using Company.Function;
-using UserKeyUtils;
+using CreateUserUtils;
 
 namespace NoCO2.Function
 {
@@ -36,7 +34,7 @@ namespace NoCO2.Function
         string hashedUserKey = BCrypt.Net.BCrypt.HashPassword(userKey);
 
         // Check if the database has a user with the same hashedUserKey
-        bool isUserAdded = AddUserToDatabase(userKey, hashedUserKey);
+        bool isUserAdded = AddUser.Add(userKey, hashedUserKey);
         if (isUserAdded) {
           responseBodyObject = new {
             reply = "Success"
@@ -60,37 +58,6 @@ namespace NoCO2.Function
         return await HttpResponseDataFactory.GetHttpResponseData(req, HttpStatusCode.InternalServerError, responseBodyObject);
       }
       throw new NotImplementedException();
-    }
-
-    // TODO: Move all Database related tasks into one class
-    private static bool AddUserToDatabase(string originalUserKey, string hashedUserKey) {
-      MySqlConnection connection = DatabaseConnecter.MySQLDatabase();
-      using(connection)
-      connection.Open();
-
-      // Start the transaction
-      using MySqlTransaction transaction = connection.BeginTransaction();
-      try
-      {
-          // Selet UserKey from Users where UserKey is equal to hashedUserKey
-          bool NotInsert = SelectUserKey.Select(connection, transaction, originalUserKey);
-          if(NotInsert)
-          {
-            return true;
-          }
-
-          // Insert a user to Users table with the hashedUserKey
-          return InsertUserKey.Insert(connection, transaction, hashedUserKey);
-      }
-      catch (Exception)
-      {
-          // An error occurred, rollback the transaction
-          transaction.Rollback();
-
-          // Handle the exception
-          connection.Close();
-          return false;
-      }
     }
   }
 }
