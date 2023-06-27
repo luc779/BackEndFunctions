@@ -4,7 +4,7 @@ namespace SubmitUserActivitiesUtil
 {
     public static class DailyEmissionsUpdate
     {
-        public static void DailyEmissionsHelper(int userID, MySqlConnection connection, DateTime todaysDate)
+        public static void Update(int userID, MySqlConnection connection, DateTime todaysDate)
         {
             // get the total Emissions from the day
             double totalEmissions = GetTotalEmissions(userID, connection, todaysDate);

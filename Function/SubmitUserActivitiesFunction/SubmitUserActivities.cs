@@ -101,7 +101,7 @@ namespace Company
                     DateTime date = DateTime.UtcNow.Date;
 
                     // delete previous entries
-                    DeleteFromDatabase(connection, userID, date);
+                    DeleteUserActivities.Delete(connection, userID, date);
 
                     // all are null no need to update database
                     if (transports.Count == 0 && foods.Count == 0 && utilities.Count == 0) {
@@ -122,7 +122,7 @@ namespace Company
                     InputActivity.Input(userID, transports, connection, date, QUERY, utility);
 
                     // update Daily emissions
-                    DailyEmissionsUpdate.DailyEmissionsHelper(userID, connection, date);
+                    DailyEmissionsUpdate.Update(userID, connection, date);
 
                     // commit and close
                     transaction.Commit();
@@ -136,23 +136,6 @@ namespace Company
                 }
             }
             return true;
-        }
-        private static void DeleteFromDatabase(MySqlConnection connection, int userID, DateTime todaysDate) {
-            // new command
-            string query = "DELETE FROM Activities WHERE UserID = '" + userID + "' AND DateTime = '" + todaysDate + "'";
-            using MySqlCommand command = new(query, connection);
-            // start transaction
-            command.Transaction = connection.BeginTransaction();
-            try
-            {
-                command.CommandText = query;
-                command.ExecuteNonQuery();
-                command.Transaction.Commit();
-            }
-            catch (Exception) {
-                command.Transaction.Rollback();
-                throw new Exception();
-            }
         }
     }
 }
