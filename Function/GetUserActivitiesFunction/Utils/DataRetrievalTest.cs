@@ -1,3 +1,4 @@
+using GetUserActivitiesUtil;
 using Xunit;
 
 namespace BackEndFucntions
@@ -13,7 +14,7 @@ namespace BackEndFucntions
         [InlineData("transport")]
         [InlineData("food")]
         [InlineData("utility")]
-        public async Task EmptyTransportRetrieval(string ACTIVITY_TYPE)
+        public void EmptyTransportRetrieval(string ACTIVITY_TYPE)
         {
             const int USER_ID = 123456789;
             DateTime TODAY = DateTime.UtcNow;

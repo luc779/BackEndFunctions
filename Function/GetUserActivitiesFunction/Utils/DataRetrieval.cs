@@ -3,9 +3,9 @@ using MySqlConnector;
 
 namespace GetUserActivitiesUtil
 {
-    public static class DataRetrieval
+    public class DataRetrieval
     {
-        public static List<dynamic> RetrieveCertainType(int userID, DateTime today, string ACTIVITY_TYPE)
+        public List<dynamic> RetrieveCertainType(int userID, DateTime today, string ACTIVITY_TYPE)
         {
             List<dynamic> Activity = null;
             string QUERY = "SELECT e.Method, e.Amount FROM Activites AS e "+
