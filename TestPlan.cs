@@ -8,7 +8,7 @@ using Company;
 
 namespace NoCO2.Test
 {
-  public class TestPlan
+  public class TestPlan : IClassFixture<CreateUser>, IClassFixture<GetEmissionHistory>, IClassFixture<GetEmissionStatistics>, IClassFixture<GetUserActivities>, IClassFixture<SubmitUserActivities>
   {
     private readonly CreateUser _createUser;
     private readonly GetEmissionHistory _getEmissionHistory;
@@ -38,7 +38,7 @@ namespace NoCO2.Test
     */
 
     [Fact]
-    public async void StepOne_CreateUser()
+    public async Task StepOne_CreateUser()
     {
       // input test userKey
       var user = new {
@@ -54,7 +54,7 @@ namespace NoCO2.Test
     }
 
     [Fact]
-    public async void StepTwo_SubmitUserActivities()
+    public async Task StepTwo_SubmitUserActivities()
     {
       List<dynamic> transportList = new();
       transportList.Add(new {Type = "Truck", Amount = "10"});
@@ -80,6 +80,25 @@ namespace NoCO2.Test
 
       Assert.Equal(HttpStatusCode.OK, response.StatusCode);
       Assert.Equal("{\"reply\":\"Success\"}", await response.GetResponseBody());
+    }
+
+    [Fact]
+    public async Task StepThree_GetUserActivities()
+    {
+      // input test userKey
+      var user = new {
+        UserKey = "OfqLCi98hTQyvHZvwu4mXMbayCW2"
+      };
+      string body = JsonConvert.SerializeObject(user);
+
+      var request = TestFactory.CreateHttpRequest(body, "post");
+      var response = await _getUserActivities.GetActivities(request);
+
+      Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+      // Verify that the response content has the expected format
+      string content = await response.GetResponseBody();
+      Assert.Matches(@"{""reply"": ""Success"",""Activities"": {""Transports"": [.*],""Foods"": [.*],""Utilities"": [.*]}}", content);
     }
   }
 }
