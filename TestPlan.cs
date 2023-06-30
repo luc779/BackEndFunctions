@@ -115,7 +115,7 @@ namespace NoCO2.Test
 
       Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-            // Verify that the response content has the expected format
+      // Verify that the response content has the expected format
       string content = await response.GetResponseBody();
       Assert.Matches(@"\{\s*""reply"":\s*""Success"",\s*""History"":\s*\[.*\]\s*}", content);
 
@@ -142,6 +142,34 @@ namespace NoCO2.Test
       // Verify that the response content has the expected format
       string content = await response.GetResponseBody();
       Assert.Matches(@"\{\s*""reply"":\s*""Success"",\s*""Statistics"":\s*\[.*\]\s*}", content);
+
+      dynamic responseObject = Newtonsoft.Json.JsonConvert.DeserializeObject(content);
+      var statisticsArray = responseObject.Statistics;
+      var expectedLength = 2;
+      Assert.Equal(expectedLength, statisticsArray.Count);
+    }
+
+        [Fact]
+    public async Task StepSix_GetUserEmissionStatistics()
+    {
+      var user = new {
+        UserKey = "OfqLCi98hTQyvHZvwu4mXMbayCW2"
+      };
+      string body = JsonConvert.SerializeObject(user);
+
+      var request = TestFactory.CreateHttpRequest(body, "get");
+      var response = await _getEmissionStatistics.GetEmissionStatisticsWithUserKey(request);
+
+      Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+      // Verify that the response content has the expected format
+      string content = await response.GetResponseBody();
+      Assert.Matches(@"\{\s*""reply"":\s*""Success"",\s*""Statistics"":\s*\[.*\]\s*}", content);
+
+      dynamic responseObject = Newtonsoft.Json.JsonConvert.DeserializeObject(content);
+      var statisticsArray = responseObject.Statistics;
+      var expectedLength = 3;
+      Assert.Equal(expectedLength, statisticsArray.Count);
     }
   }
 }
