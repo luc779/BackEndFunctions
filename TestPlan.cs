@@ -149,7 +149,7 @@ namespace NoCO2.Test
       Assert.Equal(expectedLength, statisticsArray.Count);
     }
 
-        [Fact]
+    [Fact]
     public async Task StepSix_GetUserEmissionStatistics()
     {
       var user = new {
