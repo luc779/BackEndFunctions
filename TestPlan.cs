@@ -101,7 +101,7 @@ namespace NoCO2.Test
       Assert.Matches(@"{""reply"": ""Success"",""Activities"": {""Transports"": [.*],""Foods"": [.*],""Utilities"": [.*]}}", content);
     }
 
-        [Fact]
+    [Fact]
     public async Task StepFour_GetEmissionHistory()
     {
       // input test userKey
@@ -124,6 +124,24 @@ namespace NoCO2.Test
       var historyArray = responseObject.History;
       var expectedLength = (DateTime.Now - DateTime.Now.AddYears(-1)).TotalDays;
       Assert.Equal(expectedLength, historyArray.Count);
+    }
+
+    [Fact]
+    public async Task StepFive_GetUserEmissionStatistics()
+    {
+      var user = new {
+        UserKey = "OfqLCi98hTQyvHZvwu4mXMbayCW2"
+      };
+      string body = JsonConvert.SerializeObject(user);
+
+      var request = TestFactory.CreateHttpRequest(body, "get");
+      var response = await _getEmissionStatistics.GetEmissionStatisticsWithUserKey(request);
+
+      Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+      // Verify that the response content has the expected format
+      string content = await response.GetResponseBody();
+      Assert.Matches(@"\{\s*""reply"":\s*""Success"",\s*""Statistics"":\s*\[.*\]\s*}", content);
     }
   }
 }
