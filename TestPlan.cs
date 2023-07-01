@@ -1,10 +1,12 @@
 using System.Net;
 using Xunit;
-using NoCO2.Function;
-using NoCO2.Test.Util;
+using CreateUserFunction;
+using GetEmissionHistoryFunction;
+using GetEmissionStatisticsFunction;
+using GetUserActivitiesFunction;
+using SubmitUserActivitiesFunction;
+using TestUtilities;
 using Newtonsoft.Json;
-using Company.Function;
-using Company;
 
 namespace NoCO2.Test
 {
