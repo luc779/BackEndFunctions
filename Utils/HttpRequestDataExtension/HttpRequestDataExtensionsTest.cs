@@ -1,8 +1,8 @@
+using HttpRequestDataExtensions;
+using UserKeyBody;
 using Xunit;
-using NoCO2.Util;
-using NoCO2.Function;
 
-namespace NoCO2.Test
+namespace UtilsTest
 {
   public class HttpRequestDataExtensionsTest
   {

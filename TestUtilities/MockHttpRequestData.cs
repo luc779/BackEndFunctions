@@ -1,11 +1,10 @@
 using System.Security.Claims;
-using System.Net;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Moq;
 using System.Text;
 
-namespace NoCO2.Test.Util;
+namespace TestUtilities;
 
 public sealed class MockHttpRequestData : HttpRequestData
 {

@@ -1,7 +1,7 @@
 using System.Text;
 using Newtonsoft.Json;
 
-namespace NoCO2.Util;
+namespace HttpRequestDataExtensions;
 
 public static class HttpRequestDataExtensions
 {

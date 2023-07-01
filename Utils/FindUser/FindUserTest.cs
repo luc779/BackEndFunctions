@@ -1,6 +1,7 @@
+using UserFinder;
 using Xunit;
 
-namespace BackEndFunctions.Tests.UtilsTests
+namespace UtilsTest
 {
     public static class FindUserTest
     {
