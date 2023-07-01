@@ -12,10 +12,10 @@ public static class DatabaseConnecter
 
     public static MySqlConnection MySQLDatabase()
     {
-        server = "databaseht.cyethqvobvkg.us-west-2.rds.amazonaws.com";
-        database = "Hackathon";
-        uid = "masterUsername";
-        password = "vafwa4-vozqyn-naxqAb";
+        server = "noco2.cxzqvtptlzae.us-west-2.rds.amazonaws.com";
+        database = "noco2";
+        uid = "admin";
+        password = "Ghjkl009!";
         string connectionString = "server=" + server + ";uid=" + uid +";pwd=" + password + ";database=" + database;
 
         connection = new MySqlConnection(connectionString);
