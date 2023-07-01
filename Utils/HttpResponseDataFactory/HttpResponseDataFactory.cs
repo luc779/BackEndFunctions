@@ -2,7 +2,7 @@ using System.Net;
 using Microsoft.Azure.Functions.Worker.Http;
 using Newtonsoft.Json;
 
-namespace NoCO2.Util;
+namespace HttpRequestDataFactory;
 
 public static class HttpResponseDataFactory
 {

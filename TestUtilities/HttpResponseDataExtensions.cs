@@ -1,6 +1,6 @@
 using Microsoft.Azure.Functions.Worker.Http;
 
-namespace NoCO2.Test.Util;
+namespace TestUtilities;
 
 public static class HttpResponseDataExtensions
 {

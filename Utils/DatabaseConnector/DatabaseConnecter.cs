@@ -1,6 +1,6 @@
 using MySqlConnector;
 
-namespace Company.Function;
+namespace DatabaseConnector;
 
 public static class DatabaseConnecter
 {
