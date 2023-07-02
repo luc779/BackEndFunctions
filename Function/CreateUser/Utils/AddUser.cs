@@ -7,7 +7,6 @@ namespace CreateUserUtils
     {
         public static bool Add(string originalUserKey, string hashedUserKey) {
             MySqlConnection connection = DatabaseConnecter.MySQLDatabase();
-            using(connection)
             connection.Open();
 
             // Start the transaction

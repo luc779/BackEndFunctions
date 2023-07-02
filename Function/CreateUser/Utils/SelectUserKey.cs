@@ -18,12 +18,11 @@ namespace CreateUserUtils
                     string hashedUserKeyInDB = reader.GetString(0);
                     if (BCrypt.Net.BCrypt.Verify(originalUserKey, hashedUserKeyInDB))
                     {
-                        connection.Close();
                         return true;
                     }
                 }
             }
-            // go to Insert 
+            // go to Insert
             return false;
         }
     }
