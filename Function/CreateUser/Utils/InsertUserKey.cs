@@ -8,7 +8,7 @@ namespace CreateUserUtils
         {
             using MySqlCommand command = connection.CreateCommand();
             const string userKey = "@userKey";
-            const string QUERY = "INSERT INTO Users (UserKey) Values (" + userKey + ")";
+            const string QUERY = "INSERT INTO Users (UserKey) VALUES (" + userKey + ")";
             command.CommandText = QUERY;
             command.Transaction = transaction;
             command.Parameters.AddWithValue(userKey, hashedUserKey);
@@ -18,7 +18,6 @@ namespace CreateUserUtils
             transaction.Commit();
 
             // Transaction completed successfully
-            connection.Close();
             return true;
         }
     }

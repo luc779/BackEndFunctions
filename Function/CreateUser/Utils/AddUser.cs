@@ -7,7 +7,6 @@ namespace CreateUserUtils
     {
         public static bool Add(string originalUserKey, string hashedUserKey) {
             MySqlConnection connection = DatabaseConnecter.MySQLDatabase();
-            using(connection)
             connection.Open();
 
             // Start the transaction
@@ -22,7 +21,9 @@ namespace CreateUserUtils
                 }
 
                 // Insert a user to Users table with the hashedUserKey
-                return InsertUserKey.Insert(connection, transaction, hashedUserKey);
+                bool isInserted = InsertUserKey.Insert(connection, transaction, hashedUserKey);
+                connection.Close();
+                return isInserted;
             }
             catch (Exception)
             {
