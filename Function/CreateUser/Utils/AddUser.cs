@@ -21,7 +21,9 @@ namespace CreateUserUtils
                 }
 
                 // Insert a user to Users table with the hashedUserKey
-                return InsertUserKey.Insert(connection, transaction, hashedUserKey);
+                bool isInserted = InsertUserKey.Insert(connection, transaction, hashedUserKey);
+                connection.Close();
+                return isInserted;
             }
             catch (Exception)
             {

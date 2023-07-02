@@ -18,7 +18,6 @@ namespace CreateUserUtils
             transaction.Commit();
 
             // Transaction completed successfully
-            connection.Close();
             return true;
         }
     }
