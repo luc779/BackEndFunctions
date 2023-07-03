@@ -29,6 +29,7 @@ namespace UserFinder
                         break;
                     }
                 }
+                connection.Close();
                 return ID;
             }
             catch (MySqlException)
