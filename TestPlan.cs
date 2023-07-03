@@ -69,11 +69,9 @@ namespace NoCO2.Test
 
       var bodyObject = new {
         UserKey = "OfqLCi98hTQyvHZvwu4mXMbayCW2",
-        Activities = new {
-          Transports = transportList,
-          Foods = foodsList,
-          Utilities =utlitiesList
-        }
+        Transports = transportList,
+        Foods = foodsList,
+        Utilities = utlitiesList
       };
       string body = JsonConvert.SerializeObject(bodyObject);
 

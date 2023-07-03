@@ -10,7 +10,7 @@ namespace CreateUserUtils
             connection.Open();
 
             // Start the transaction
-            using MySqlTransaction transaction = connection.BeginTransaction();
+            MySqlTransaction transaction = connection.BeginTransaction();
             try
             {
                 // Selet UserKey from Users where UserKey is equal to hashedUserKey
