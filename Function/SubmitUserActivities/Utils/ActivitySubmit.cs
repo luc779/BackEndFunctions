@@ -14,50 +14,45 @@ namespace SubmitUserActivitiesUtil
 
             // create connection
             MySqlConnection connection = DatabaseConnecter.MySQLDatabase();
-            using(connection)
+            connection.Open();
+            MySqlTransaction transaction = connection.BeginTransaction();
+            try
             {
-                connection.Open();
-                using MySqlTransaction transaction = connection.BeginTransaction();
-                try
-                {
-                    DateTime date = DateTime.UtcNow.Date;
+                DateTime date = DateTime.UtcNow;
 
-                    // delete previous entries
-                    DeleteUserActivities.Delete(connection, userID, date);
+                // delete previous entries
+                DeleteUserActivities.Delete(connection, transaction, userID, date);
 
-                    // all are null no need to update database
-                    if (transports.Count == 0 && foods.Count == 0 && utilities.Count == 0) {
-                        return true;
-                    }
-
+                // all are null no need to update database
+                if (transports.Count != 0 || foods.Count != 0 || utilities.Count != 0) {
                     // input new entries using same query
-                    const string QUERY = "INSERT INTO Activities (UserID, ActivityType, Method, Amount, DateTime, Emission) Values (@UserID, @ActivityType, @Method, @Amount, @DateTime, @Emission)";
+                    const string QUERY = "INSERT INTO Activities (UserID, ActivityType, Method, Amount, DateTime, Emission) VALUES ((SELECT ID FROM Users WHERE ID = @UserID), @ActivityType, @Method, @Amount, @DateTime, @Emission)";
                     const string transport = "transport";
                     const string food = "food";
                     const string utility = "utility";
 
                     // input transport
-                    InputActivity.Input(userID, transports, connection, date, QUERY, transport);
+                    InputActivity.Input(userID, transports, connection, transaction, date, QUERY, transport);
+
                     // input food
-                    InputActivity.Input(userID, transports, connection, date, QUERY, food);
+                    InputActivity.Input(userID, foods, connection, transaction, date, QUERY, food);
                     // input utility
-                    InputActivity.Input(userID, transports, connection, date, QUERY, utility);
-
-                    // update Daily emissions
-                    DailyEmissionsUpdate.Update(userID, connection, date);
-
-                    // commit and close
-                    transaction.Commit();
-                    connection.Close();
+                    InputActivity.Input(userID, utilities, connection, transaction, date, QUERY, utility);
                 }
-                catch (Exception)
-                {
-                    transaction.Rollback();
-                    connection.Close();
-                    return false;
-                }
+
+                // update Daily emissions
+                DailyEmissionsUpdate.Update(userID, connection, transaction, date);
+
+                // commit and close
+                transaction.Commit();
+                connection.Close();
+                return true;
             }
-            return true;
+            catch (Exception)
+            {
+                connection.Close();
+                return false;
+            }
         }
     }
 }
