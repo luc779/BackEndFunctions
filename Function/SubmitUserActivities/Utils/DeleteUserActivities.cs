@@ -4,20 +4,19 @@ namespace SubmitUserActivitiesUtil
 {
     public static class DeleteUserActivities
     {
-        public static void Delete(MySqlConnection connection, int userID, DateTime todaysDate) {
+        public static void Delete(MySqlConnection connection, MySqlTransaction transaction, int userID, DateTime todaysDate) {
             // new command
-            string query = "DELETE FROM Activities WHERE UserID = '" + userID + "' AND DateTime = '" + todaysDate + "'";
+            string query = "DELETE a FROM Activities AS a JOIN Users AS u ON a.UserID = u.ID WHERE u.ID = @UserId AND a.DateTime = @DateTime";
             using MySqlCommand command = new(query, connection);
             // start transaction
-            command.Transaction = connection.BeginTransaction();
+            command.Transaction = transaction;
             try
             {
-                command.CommandText = query;
+                command.Parameters.AddWithValue("@UserId", userID);
+                command.Parameters.AddWithValue("@DateTime", todaysDate.ToString("yyyy-MM-dd"));
                 command.ExecuteNonQuery();
-                command.Transaction.Commit();
             }
             catch (Exception) {
-                command.Transaction.Rollback();
                 throw new Exception();
             }
         }
