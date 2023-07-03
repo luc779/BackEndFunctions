@@ -17,7 +17,7 @@ namespace SubmitUserActivitiesUtil
             // go through each amount in transports and check if its a number variable
             foreach (var transport in transports)
             {
-                string amount = transport.Miles;
+                string amount = transport.Amount;
                 if (!double.TryParse(amount, out _))
                 {
                     return false; // Invalid non-number value found, return false
@@ -43,7 +43,7 @@ namespace SubmitUserActivitiesUtil
             // go through each utilities in transports and check if its a number variable
             foreach (var utility in utilities)
             {
-                string amount = utility.Hours;
+                string amount = utility.Amount;
                 if (!double.TryParse(amount, out _))
                 {
                     return false; // Invalid non-number value found, return false
