@@ -98,7 +98,7 @@ namespace NoCO2.Test
 
       // Verify that the response content has the expected format
       string content = await response.GetResponseBody();
-      Assert.Matches(@"{""reply"": ""Success"",""Activities"": {""Transports"": [.*],""Foods"": [.*],""Utilities"": [.*]}}", content);
+      Assert.Matches(@"\{""reply"":""Success"",""Transports"":\[.*\],""Foods"":\[.*\],""Utilities"":\[.*\]}", content);
     }
 
     [Fact]
