@@ -19,14 +19,14 @@ namespace GetEmissionHistoryUtils
                 const string query = "SELECT e.DateTime, e.TotalAmount, e.Goal " +
                     "FROM DailyEmission AS e " +
                     "JOIN Users AS u ON e.UserID = u.ID " +
-                    "WHERE u.ID = @userId AND e.DateTime >= '@oneYearAgo' AND e.DateTime <= '@currentDate'" +
+                    "WHERE u.ID = @userId AND e.DateTime >= @oneYearAgo AND e.DateTime <= @currentDate" +
                     " ORDER BY e.DateTime ASC";
 
                 using MySqlCommand command = connection.CreateCommand();
                 command.CommandText = query;
                 command.Parameters.AddWithValue("@userId", userId);
-                command.Parameters.AddWithValue("@oneYearAgo", oneYearAgo.ToString("yyyy/MM/dd"));
-                command.Parameters.AddWithValue("@currentDate", currentDate.ToString("yyyy/MM/dd"));
+                command.Parameters.AddWithValue("@oneYearAgo", oneYearAgo.ToString("yyyy-MM-dd"));
+                command.Parameters.AddWithValue("@currentDate", currentDate.ToString("yyyy-MM-dd"));
 
                 using MySqlDataReader reader = await command.ExecuteReaderAsync();
                 List<DailyEmission> emissions = new ();
