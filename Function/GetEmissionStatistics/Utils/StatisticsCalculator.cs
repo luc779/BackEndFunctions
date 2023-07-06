@@ -27,6 +27,7 @@ internal class StatisticsCalculator
       }
     } catch (Exception ex) {
       Console.WriteLine(ex.Message);
+      throw;
     }
     return statistics;
   }
@@ -49,13 +50,13 @@ internal class StatisticsCalculator
       const string query = "SELECT a.ActivityType, a.Emission " +
         "FROM Activities AS a " +
         "JOIN Users AS u ON a.UserID = u.ID " +
-        "WHERE u.ID = @userId AND a.DateTime >= '@oneWeekAgo' AND a.DateTime <= '@currentDate'";
+        "WHERE u.ID = @userId AND a.DateTime >= @oneWeekAgo AND a.DateTime <= @currentDate";
 
       using MySqlCommand command = connection.CreateCommand();
       command.CommandText = query;
       command.Parameters.AddWithValue("@userId", userID);
-      command.Parameters.AddWithValue("@oneWeekAgo", oneWeekAgo.ToString("yyyy/MM/dd"));
-      command.Parameters.AddWithValue("@currentDate", currentDate.ToString("yyyy/MM/dd"));
+      command.Parameters.AddWithValue("@oneWeekAgo", oneWeekAgo.ToString("yyyy-MM-dd"));
+      command.Parameters.AddWithValue("@currentDate", currentDate.ToString("yyyy-MM-dd"));
 
       using MySqlDataReader reader = command.ExecuteReader();
       if (reader.HasRows)
@@ -158,13 +159,13 @@ internal class StatisticsCalculator
 
       const string query = "SELECT e.TotalAmount FROM DailyEmission AS e " +
         "JOIN Users AS u ON e.UserID = u.ID " +
-        "WHERE u.ID = @userId AND e.DateTime >= '@previousDate' AND e.DateTime <= '@currentDate'";
+        "WHERE u.ID = @userId AND e.DateTime >= @previousDate AND e.DateTime <= @currentDate";
 
       using MySqlCommand command = connection.CreateCommand();
       command.CommandText = query;
       command.Parameters.AddWithValue("@userId", userID);
-      command.Parameters.AddWithValue("@previousDate", previousDate.ToString("yyyy/MM/dd"));
-      command.Parameters.AddWithValue("@currentDate", currentDate.ToString("yyyy/MM/dd"));
+      command.Parameters.AddWithValue("@previousDate", previousDate.ToString("yyyy-MM-dd"));
+      command.Parameters.AddWithValue("@currentDate", currentDate.ToString("yyyy-MM-dd"));
 
       using MySqlDataReader reader = command.ExecuteReader();
       if (reader.HasRows)
