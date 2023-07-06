@@ -1,3 +1,4 @@
+using System;
 using System.Net;
 using Xunit;
 using CreateUserFunction;
@@ -122,7 +123,7 @@ namespace NoCO2.Test
       // Verify the length of the History array
       dynamic responseObject = Newtonsoft.Json.JsonConvert.DeserializeObject(content);
       var historyArray = responseObject.History;
-      var expectedLength = (DateTime.Now - DateTime.Now.AddYears(-1)).TotalDays;
+      var expectedLength = Math.Ceiling((DateTime.Now - DateTime.Now.AddYears(-1)).TotalDays);
       Assert.Equal(expectedLength, historyArray.Count);
     }
 
