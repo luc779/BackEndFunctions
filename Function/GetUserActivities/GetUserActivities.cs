@@ -18,7 +18,7 @@ namespace GetUserActivitiesFunction
         }
 
         [Function("GetUserActivities")]
-        public async Task<HttpResponseData> GetActivities([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "get-user-activities")] HttpRequestData req)
+        public async Task<HttpResponseData> GetActivities([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "get-user-activities")] HttpRequestData req)
         {
             var responseBodyObject = new {
                 reply = "InternalError"
