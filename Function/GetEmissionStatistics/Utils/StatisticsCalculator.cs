@@ -90,7 +90,7 @@ internal class StatisticsCalculator
     {
       Statistic = "Highest Emission Activity",
       Topic = char.ToUpper(highestEmissionActivity.Key[0]) + highestEmissionActivity.Key.Substring(1),
-      Stat = highestEmissionActivity.Value.ToString("0.00")
+      Stat = (highestEmissionActivity.Value * 100).ToString("0.00") + "%"
     };
   }
 
@@ -110,7 +110,7 @@ internal class StatisticsCalculator
     {
       Statistic = "Average Emission",
       Topic = "Within 1 Week",
-      Stat = average.ToString("0.00")
+      Stat = average.ToString("0.00") + " lb"
     };
   }
 
@@ -143,7 +143,7 @@ internal class StatisticsCalculator
     {
       Statistic = "Emission Difference",
       Topic = "Between 2 Weeks",
-      Stat = stat
+      Stat = stat + " lb"
     };
   }
 
