@@ -2,7 +2,7 @@ namespace GetEmissionHistoryUtils
 {
     public static class ConvertToEmptyEmission
     {
-        private const double EMISSION_GOAL = 7.36;
+        private const double EMISSION_GOAL = 60.4;
         public static DailyEmission Convert(DateTime date) {
             return new DailyEmission
                 {

@@ -52,7 +52,7 @@ namespace FunctionsTest
       };
       string body = JsonConvert.SerializeObject(user);
 
-      var request = TestFactory.CreateHttpRequest(body, "get");
+      var request = TestFactory.CreateHttpRequest(body, "post");
       var response = await _getEmissionStatistics.GetEmissionStatisticsWithUserKey(request);
 
       Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
@@ -67,7 +67,7 @@ namespace FunctionsTest
       };
       string body = JsonConvert.SerializeObject(user);
 
-      var request = TestFactory.CreateHttpRequest(body, "get");
+      var request = TestFactory.CreateHttpRequest(body, "post");
       var response = await _getEmissionStatistics.GetEmissionStatisticsWithUserKey(request);
 
       Assert.Equal(HttpStatusCode.OK, response.StatusCode);

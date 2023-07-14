@@ -19,7 +19,7 @@ namespace GetEmissionHistoryFunction
 
     [Function("GetEmissionHistory")]
     public async Task<HttpResponseData> GetEmissionHistoryWithUserKey(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "get-emission-history")] HttpRequestData req)
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "get-emission-history")] HttpRequestData req)
     {
       var responseBodyObject = new {
         reply = "InternalError"

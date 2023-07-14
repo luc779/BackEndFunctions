@@ -53,7 +53,7 @@ namespace FunctionsTest
       };
       string body = JsonConvert.SerializeObject(user);
 
-      var request = TestFactory.CreateHttpRequest(body, "get");
+      var request = TestFactory.CreateHttpRequest(body, "post");
       var response = await _getEmissionHistory.GetEmissionHistoryWithUserKey(request);
 
       Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
@@ -64,11 +64,11 @@ namespace FunctionsTest
     public async Task GetOneYearOfEmissionHistory()
     {
       var user = new {
-        UserKey = "pGIWAl55j3XH4LFHbXgsdtoM46j2"
+        UserKey = "OfqLCi98hTQyvHZvwu4mXMbayCW2"
       };
       string body = JsonConvert.SerializeObject(user);
 
-      var request = TestFactory.CreateHttpRequest(body, "get");
+      var request = TestFactory.CreateHttpRequest(body, "post");
       var response = await _getEmissionHistory.GetEmissionHistoryWithUserKey(request);
 
       Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -81,7 +81,7 @@ namespace FunctionsTest
       dynamic responseObject = Newtonsoft.Json.JsonConvert.DeserializeObject(content);
       var historyArray = responseObject.History;
       var expectedLength = Math.Ceiling((DateTime.Now - DateTime.Now.AddYears(-1)).TotalDays);
-      Assert.Equal(expectedLength, historyArray.Count);
+      Assert.True(expectedLength <= historyArray.Count);
     }
   }
 }

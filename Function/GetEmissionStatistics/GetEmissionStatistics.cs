@@ -19,7 +19,7 @@ namespace GetEmissionStatisticsFunction
 
     [Function("GetEmissionStatistics")]
     public async Task<HttpResponseData> GetEmissionStatisticsWithUserKey(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "get-emission-statistics")] HttpRequestData req)
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "get-emission-statistics")] HttpRequestData req)
     {
       var responseBodyObject = new {
         reply = "InternalError"

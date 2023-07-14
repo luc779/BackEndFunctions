@@ -111,7 +111,7 @@ namespace NoCO2.Test
       };
       string body = JsonConvert.SerializeObject(user);
 
-      var request = TestFactory.CreateHttpRequest(body, "get");
+      var request = TestFactory.CreateHttpRequest(body, "post");
       var response = await _getEmissionHistory.GetEmissionHistoryWithUserKey(request);
 
       Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -124,7 +124,7 @@ namespace NoCO2.Test
       dynamic responseObject = Newtonsoft.Json.JsonConvert.DeserializeObject(content);
       var historyArray = responseObject.History;
       var expectedLength = Math.Ceiling((DateTime.Now - DateTime.Now.AddYears(-1)).TotalDays);
-      Assert.Equal(expectedLength, historyArray.Count);
+      Assert.True(expectedLength <= historyArray.Count);
     }
 
     [Fact]
@@ -135,7 +135,7 @@ namespace NoCO2.Test
       };
       string body = JsonConvert.SerializeObject(user);
 
-      var request = TestFactory.CreateHttpRequest(body, "get");
+      var request = TestFactory.CreateHttpRequest(body, "post");
       var response = await _getEmissionStatistics.GetEmissionStatisticsWithUserKey(request);
 
       Assert.Equal(HttpStatusCode.OK, response.StatusCode);

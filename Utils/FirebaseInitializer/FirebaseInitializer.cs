@@ -9,7 +9,7 @@ public static class FirebaseInitializer
         if (!isInitialized)
         {
             try {
-                string credentialsPath = "../../../Properties/noco2-e46fa-firebase-adminsdk-fta0k-c6f39e61a6.json";
+                string credentialsPath = "Properties/noco2-e46fa-firebase-adminsdk-fta0k-c6f39e61a6.json";
 
                 FirebaseApp.Create(new AppOptions()
                 {

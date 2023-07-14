@@ -34,6 +34,11 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Properties/noco2-e46fa-firebase-adminsdk-fta0k-c6f39e61a6.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
     <Using Include="System.Threading.ExecutionContext" Alias="ExecutionContext" />
   </ItemGroup>
 </Project>
