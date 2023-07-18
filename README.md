@@ -15,7 +15,7 @@ provides a dashboard page where users can view statistic cards, such as the high
 -[Usage](#usage)
 -[FrontEnd](#frontend)
 
-##Overview 
+## Overview 
 
 - Utilizes AWS relational database servers to host user data. (limited to ~750 hours or 20GB of general purpose SSD)
 - Implements Azure Functions to run event-triggered code per user action. (limited to 1 million requests)
@@ -25,10 +25,6 @@ provides a dashboard page where users can view statistic cards, such as the high
 - Backend Design Document: https://docs.google.com/document/d/160lD5WHeMGaCdqcMrERJ9ZNQLIFcvJkMV08khmIhUjY/edit?usp=sharing
 
 To view deployed react page, please navigate to https://tsechapman.github.io/NoCO2/ 
-
-## Installation
-
-To run the NoCO2 app on your local machine, please follow these steps:
 
 ## Installation
 
