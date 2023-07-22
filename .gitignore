@@ -265,3 +265,6 @@ __pycache__/
 
 # Firebase Admin Private key
 Properties/noco2-e46fa-firebase-adminsdk-fta0k-c6f39e61a6.json
+
+#Database Connection
+Utils/DatabaseConnector/DatabaseConnector.cs
