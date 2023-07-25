@@ -33,7 +33,7 @@ To run the NoCO2 app on your local machine, please follow these steps:
 1. Clone the repository (frontend):
 
 ```bash
-git clone https://github.com/TseChapman/NoCO2.git
+https://github.com/luc779/BackEndFunctions.git
 ```
 
 2. Navigate to the project directory:
@@ -45,32 +45,44 @@ cd NoCO2
 3. Install the dependencies:
 
 ```bash
-npm install
+dotnet install
 ```
 
-4. Define correct environment variables. Create a `.env` file containing environment variables. Then, add the following environment variables to your backend URL and firebase authentication configurations (Replace `...` accordingly).
+4. Create database instance:
+
+Use whichever database host to create a database instance and use the backend documentation to create the 3 tables using MySqlWorkBench.
+
+5. Define correct connection string variables. Create a `DatabaseConnector.cs` file. Then, add the following evironment variabls to your backend (Replace `...` accordingly).
 
 ```
-REACT_APP_FIREBASE_API_KEY = "..."
-REACT_APP_FIREBASE_AUTH_DOMAIN = "..."
-REACT_APP_FIREBASE_PROJECT_ID = "..."
-REACT_APP_FIREBASE_STORAGE_BUCKET = "..."
-REACT_APP_FIREBASE_MESSAGING_SENDER_ID = "..."
-REACT_APP_FIREBASE_API_ID = "..."
-REACT_APP_FIREBASE_MEASUREMENT_ID = "..."
-REACT_APP_NOCO2_API_URL = "..."
+using MySqlConnector;
+
+namespace DatabaseConnector;
+
+public static class DatabaseConnecter
+{
+    private static MySqlConnection connection;
+    private static string server;
+    private static string database;
+    private static string uid;
+    private static string password;
+
+    public static MySqlConnection MySQLDatabase()
+    {
+        server = "...";
+        database = "...";
+        uid = "...";
+        password = "...";
+        string connectionString = "server=" + server + ";uid=" + uid +";pwd=" + password + ";database=" + database;
+
+        connection = new MySqlConnection(connectionString);
+        return connection;
+    }
+}
 ```
-## Usage
+Connect to database, using MySqlWorkBench to visualize the data within the database.
 
-Once you have completed the installation steps, you can start using NoCO2:
-
-Start the development server:
-```bash
-npm start
-```
-Open your web browser and visit http://localhost:3000/NoCO2/ to access the NoCO2 app.
-
-You can now explore the different features of the app, including entering your daily activities and viewing the line chart and statistic cards on the dashboard page once you login with a valid email and password.
+You can now run all tests for main utilities,and for functions and their utilities. All tests can be run individually, per file, or all using `dotnet test`.
 
 ## Frontend
 
